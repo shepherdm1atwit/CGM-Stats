@@ -50,9 +50,8 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session):
         db_user.verification_code = verification_code
         user_dict = schemas.User.from_orm(user).dict()
 
-
-        #TESTING ONLY
-        #url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
+        # TESTING ONLY
+        # url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
         url = f"{request.url.scheme}://{request.client.host}:3000/verifyemail/{token.hex()}"
 
         await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
@@ -81,8 +80,6 @@ async def verify_email(token: str, db: Session):
         user.verified_email = True
         db.commit()
         return await create_token(user)
-
-
 
 
 async def authenticate_user(email: str, password: str, db: Session):
