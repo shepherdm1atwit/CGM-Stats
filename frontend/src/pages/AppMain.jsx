@@ -3,6 +3,7 @@ import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
 import Register from "../components/Register";
 import Login from "../components/Login";
+import ForgotPassword from "../components/ForgotPassword";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -37,7 +38,8 @@ const AppMain = () => {
                 <div className="column m-5 is-two-thirds">
                     {!token ? (
                         <div className="columns">
-                            <Register /> <Login />
+                            <Register /> <Login /> <ForgotPassword />
+
                         </div>
                     ) : (
                         <p> Hello there </p>

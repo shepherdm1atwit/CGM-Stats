@@ -39,7 +39,7 @@ async def generate_email(user: schemas.CreateUser, db_user: models.User, request
 
     # TESTING ONLY
     # url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
-    url = f"{request.url.scheme}://{request.client.host}:3000/verifyemail/{token.hex()}"
+    url = f"{request.url.scheme}://localhost:3000/verifyemail/{token.hex()}"
 
     return await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
 
