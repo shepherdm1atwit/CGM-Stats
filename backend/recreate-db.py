@@ -1,3 +1,4 @@
-import services
+from services import create_database
 
-services.create_database()
+
+create_database()

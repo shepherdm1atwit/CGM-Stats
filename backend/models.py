@@ -12,6 +12,7 @@ class User(Base):
     hashed_password = Column(String)
     verification_code = Column(String, default=None)
     verified_email = Column(Boolean, default=False)
+    #
 
     def verify_password(self, password: str):
         return bcrypt.verify(password, self.hashed_password)
