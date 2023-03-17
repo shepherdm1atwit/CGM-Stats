@@ -39,7 +39,6 @@ const AppMain = () => {
                     {!token ? (
                         <div className="columns">
                             <Register /> <Login /> <ForgotPassword />
-
                         </div>
                     ) : (
                         <p> Hello there </p>

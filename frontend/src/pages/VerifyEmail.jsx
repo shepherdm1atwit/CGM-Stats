@@ -3,6 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 
 import { UserContext } from "../context/UserContext";
 import ErrorMessage from "../components/ErrorMessage";
+import Header from "../components/Header";
 
 
 const VerifyEmail = () => {
@@ -24,7 +25,8 @@ const VerifyEmail = () => {
         if (!response.ok) {
             setErrorMessage(data.detail);
         } else {
-            setToken(data.access_token);
+            //setToken(data.access_token);
+            console.log("Successful Verification");
         }
     };
 

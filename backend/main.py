@@ -40,4 +40,4 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
 
 @app.get("/api")
 async def root():
-    return {"message": "Test App Thing"}
+    return {"message": "CGM Stats"}
