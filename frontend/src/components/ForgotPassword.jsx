@@ -5,13 +5,19 @@ import { UserContext } from "../context/UserContext";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e) => {
    e.preventDefault();
-
-   console.log("Testing forgotpassword")
-
-   setErrorMessage("To be implemented :)")
+    // Implement email validation logic here
+    // For testing, just check if the email contains an '@' symbol
+    if (email.includes("@")) {
+      setSuccessMessage("Please check your email for reset link.");
+      setErrorMessage("");
+    } else {
+      setSuccessMessage("");
+      setErrorMessage("Please enter a valid email.");
+    }
 
     };
 
@@ -35,7 +41,10 @@ const ForgotPassword = () => {
           </div>
 
         </div>
-        <ErrorMessage message={errorMessage} />
+       <ErrorMessage message={errorMessage} color="red" />
+        {successMessage && (
+          <div className="notification is-primary">{successMessage}</div>
+        )}
         <br />
         <button className="button is-primary" type="submit">
           Send Reset Link
