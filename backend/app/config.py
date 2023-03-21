@@ -5,6 +5,8 @@ class Settings(BaseSettings):
 
     JWT_PRIVATE_KEY: str
 
+    HOST_DOMAIN: str
+
     EMAIL_HOST: str
     EMAIL_PORT: int
     EMAIL_USERNAME: str
@@ -12,7 +14,7 @@ class Settings(BaseSettings):
     EMAIL_FROM: EmailStr
 
     class Config:
-        env_file = ".env"
+        env_file = "app.config"
 
 
 settings = Settings()

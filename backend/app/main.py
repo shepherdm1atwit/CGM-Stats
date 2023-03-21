@@ -1,9 +1,8 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, security, status
+from fastapi import Depends, FastAPI, HTTPException, Request, security
 from sqlalchemy.orm import Session
 import services
 import schemas
-from typing import List
-from pydantic import EmailStr
+
 app = FastAPI()
 
 
@@ -24,7 +23,8 @@ async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.g
 
 
 @app.post("/token")
-async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(services.get_db)):
+async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
+    services.get_db)):
     user = await services.authenticate_user(form_data.username, form_data.password, db)
 
     if not user:

@@ -14,7 +14,7 @@ const Register = () => {
       body: JSON.stringify({ email: email, hashed_password: password }),
     };
 
-    const response = await fetch("/register", requestOptions);
+    const response = await fetch("/api/register", requestOptions);
     const data = await response.json();
 
     if (!response.ok) {

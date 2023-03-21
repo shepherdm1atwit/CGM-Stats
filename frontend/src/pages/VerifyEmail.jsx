@@ -3,7 +3,6 @@ import {useNavigate, useParams} from "react-router-dom";
 
 import { UserContext } from "../context/UserContext";
 import ErrorMessage from "../components/ErrorMessage";
-import Header from "../components/Header";
 
 
 const VerifyEmail = () => {
@@ -19,7 +18,7 @@ const VerifyEmail = () => {
             body: JSON.stringify({ token: verificationCode }),
         };
 
-        const response = await fetch("/verifyemail", requestOptions);
+        const response = await fetch("/api/verifyemail", requestOptions);
         const data = await response.json();
 
         if (!response.ok) {

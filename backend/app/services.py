@@ -38,8 +38,8 @@ async def generate_email(user: schemas.CreateUser, db_user: models.User, request
     user_dict = schemas.User.from_orm(user).dict()
 
     # TESTING ONLY
-    # url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/verifyemail/{token.hex()}"
-    url = f"{request.url.scheme}://localhost:3000/verifyemail/{token.hex()}"
+    domain = settings.HOST_DOMAIN
+    url = f"{request.url.scheme}://{domain}/verifyemail/{token.hex()}"
 
     return await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
 
@@ -59,6 +59,7 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session):
         db.refresh(db_user)
 
     except Exception as error:
+        print(error)
         raise HTTPException(
             status_code=500, detail='Error sending verification email')
 

@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import orm, Column, ForeignKey, String, Integer, Boolean, DateTime
+from sqlalchemy import Column, String, Integer, Boolean
 from passlib.hash import bcrypt
 from database import Base
 
