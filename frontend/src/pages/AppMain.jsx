@@ -30,24 +30,64 @@ const AppMain = () => {
         getWelcomeMessage();
     }, []);
 
-    return (
-        <>
-            <Header title={message} />
-            <div className="columns">
-                <div className="column"></div>
-                <div className="column m-5 is-two-thirds">
-                    {!token ? (
-                        <div className="columns">
-                            <Register /> <Login /> <ForgotPassword />
-                        </div>
-                    ) : (
-                        <p> Hello there </p>
-                    )}
-                </div>
-                <div className="column"></div>
-            </div>
-        </>
-    );
+    const [showRegister, setShowRegister] = useState(false);
+    const [showLogin, setShowLogin] = useState(true);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+   return (
+    <>
+      <Header title={message} />
+      <div className="columns">
+        <div className="column"></div>
+        <div className="column m-5 is-two-thirds">
+          {!token ? (
+            <>
+              <div className="buttons">
+                <button
+                  className={showRegister ? "button is-primary" : "button"}
+                  onClick={() => {
+                    setShowRegister(true);
+                    setShowLogin(false);
+                    setShowForgotPassword(false);
+                  }}
+                >
+                  Register
+                </button>
+                <button
+                  className={showLogin ? "button is-primary" : "button"}
+                  onClick={() => {
+                    setShowRegister(false);
+                    setShowLogin(true);
+                    setShowForgotPassword(false);
+                  }}
+                >
+                  Login
+                </button>
+                <button
+                  className={
+                    showForgotPassword ? "button is-primary" : "button"
+                  }
+                  onClick={() => {
+                    setShowRegister(false);
+                    setShowLogin(false);
+                    setShowForgotPassword(true);
+                  }}
+                >
+                  Forgot Password
+                </button>
+              </div>
+              {showRegister && <Register />}
+              {showLogin && <Login />}
+              {showForgotPassword && <ForgotPassword />}
+            </>
+          ) : (
+            <p> Hello there </p>
+          )}
+        </div>
+        <div className="column"></div>
+      </div>
+    </>
+  );
 };
 
 export default AppMain;

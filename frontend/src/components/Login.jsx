@@ -32,10 +32,10 @@ const Login = () => {
     submitLogin();
   };
 
-  const handleForgotPassword = (e) => {
-    e.preventDefault();
-    console.log("show forgot password");
-  }
+ // const handleForgotPassword = (e) => {
+ //   e.preventDefault();
+ //   console.log("show forgot password");
+ // }
 
   return (
     <div className="column">
@@ -73,9 +73,6 @@ const Login = () => {
         <br />
         <button className="button is-primary" type="submit">
           Login
-        </button>
-        <button className="button is-link" onClick={handleForgotPassword}>
-          Forgot Password
         </button>
       </form>
     </div>

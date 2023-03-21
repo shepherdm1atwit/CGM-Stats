@@ -26,10 +26,12 @@ const Register = () => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {
       submitRegistration();
+     } else {
+    if (password.length <= 5) {
+      setErrorMessage("Password must be at least 6 characters long");
     } else {
-      setErrorMessage(
-        "Ensure that the passwords match and greater than 5 characters"
-      );
+      setErrorMessage("Password and confirmation password do not match");
+    }
     }
   };
 
