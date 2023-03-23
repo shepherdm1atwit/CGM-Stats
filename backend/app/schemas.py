@@ -21,3 +21,12 @@ class User(UserBase):
 
 class VerifyEmail(BaseModel):
     token: str
+
+
+class ForgotPassEmail(BaseModel):
+    email: str
+
+
+class ResetPass(BaseModel):
+    token: str
+    password: str

@@ -28,14 +28,16 @@ async def get_user_by_email(email: str, db: Session):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-async def generate_email(user: schemas.CreateUser, db_user: models.User, request: Request):
+async def generate_email(db_user: models.User, request: Request):
     token = randbytes(10)
     hashedCode = sha256()
     hashedCode.update(token)
     verification_code = hashedCode.hexdigest()
 
     db_user.verification_code = verification_code
-    user_dict = schemas.User.from_orm(user).dict()
+
+    user_dict = {"email": db_user.email, "id": db_user.id}
+
 
     # TESTING ONLY
     domain = settings.HOST_DOMAIN
@@ -54,7 +56,7 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session):
     db_user = db.query(models.User).filter_by(email=user.email).filter(models.User.verified_email == False).first()
 
     try:
-        await generate_email(user=user, db_user=db_user, request=request)
+        await generate_email(db_user=db_user, request=request)
         db.commit()
         db.refresh(db_user)
 

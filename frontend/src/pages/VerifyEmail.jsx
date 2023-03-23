@@ -9,7 +9,6 @@ const VerifyEmail = () => {
     const navigate = useNavigate();
     const {verificationCode} = useParams();
     const [errorMessage, setErrorMessage] = useState("");
-    const [, setToken] = useContext(UserContext);
 
     const submitVerification = async () => {
         const requestOptions = {

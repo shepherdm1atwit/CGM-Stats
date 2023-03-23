@@ -5,6 +5,10 @@ import schemas
 
 app = FastAPI()
 
+@app.get("/api")
+async def root():
+    return {"message": "CGM Stats"}
+
 
 @app.post("/register")
 async def create_user(user: schemas.CreateUser, request: Request, db: Session = Depends(services.get_db)):
@@ -15,11 +19,6 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session = 
     usr = await services.create_user(user=user, request=request, db=db)
 
     return {"message": "Account created successfully"}
-
-
-@app.post('/verifyemail')
-async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
-    return await services.verify_email(token=token.token, db=db)
 
 
 @app.post("/token")
@@ -38,6 +37,14 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
 
 
-@app.get("/api")
-async def root():
-    return {"message": "CGM Stats"}
+@app.post('/verifyemail')
+async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
+    return await services.verify_email(token=token.token, db=db)
+
+
+@app.post('/resetrequest')
+async def reset_password(email: schemas.ForgotPassEmail):#, db: Session = Depends(services.get_db)):
+    print(email.email)
+    return {"email": email.email}
+
+
