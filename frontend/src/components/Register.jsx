@@ -7,6 +7,8 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const submitRegistration = async () => {
     const requestOptions = {
       method: "POST",
@@ -26,11 +28,15 @@ const Register = () => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {
       submitRegistration();
+      setSuccessMessage("Please check your email for verification link.");
+      setErrorMessage("");
      } else {
     if (password.length <= 5) {
       setErrorMessage("Password must be at least 6 characters long");
+      setSuccessMessage("");
     } else {
       setErrorMessage("Password and confirmation password do not match");
+      setSuccessMessage("");
     }
     }
   };
@@ -81,7 +87,10 @@ const Register = () => {
             />
           </div>
         </div>
-        <ErrorMessage message={errorMessage} />
+        <ErrorMessage message={errorMessage} color="red" />
+        {successMessage && (
+          <div className="notification is-primary">{successMessage}</div>
+        )}
         <br />
         <button className="button is-primary" type="submit">
           Register
