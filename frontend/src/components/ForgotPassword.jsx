@@ -7,17 +7,29 @@ const ForgotPassword = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleSubmit = async (e) => {
-   e.preventDefault();
-    // Implement email validation logic here
-    // For testing, just check if the email contains an '@' symbol
-    if (email.includes("@")) {
+  const submitReset = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email }),
+    };
+
+    const response = await fetch("/api/resetrequest", requestOptions);
+    const data = await response.json();
+
+    if (!response.ok) {
+
       setSuccessMessage("Please check your email for reset link.");
       setErrorMessage("");
     } else {
       setSuccessMessage("");
       setErrorMessage("Please enter a valid email.");
     }
+  };
+  const handleSubmit = async (e) => {
+   e.preventDefault();
+
+    submitReset();
 
     };
 
