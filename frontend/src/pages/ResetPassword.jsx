@@ -1,21 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
-import {UserContext} from "../context/UserContext";
+import React from "react";
 import Header from "../components/Header";
-import Register from "../components/Register";
-import Login from "../components/Login";
-import ForgotPassword from "../components/ForgotPassword";
+import NewPass from "../components/NewPass";
 
 const ResetPassword = () => {
-    const [message, setMessage] = useState("");
-    const [token] = useContext(UserContext);
-
-   return (
+  return (
     <>
-      <Header title={message} />
+      <Header title="Reset Password" />
       <div className="columns">
         <div className="column"></div>
         <div className="column m-5 is-two-thirds">
-         </div>
+          <NewPass />
+        </div>
         <div className="column"></div>
       </div>
     </>

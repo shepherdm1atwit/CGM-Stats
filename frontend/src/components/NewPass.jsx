@@ -1,15 +1,14 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, { useState, useContext } from "react";
 import ErrorMessage from "./ErrorMessage";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
-
 
 const NewPass = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const {verificationCode} = useParams();
+  const { verificationCode } = useParams();
   const [errorMessage, setErrorMessage] = useState("");
   const [, setToken] = useContext(UserContext);
   const [successMessage, setSuccessMessage] = useState("");
@@ -21,12 +20,22 @@ const NewPass = () => {
       body: JSON.stringify({ hashed_password: password }),
     };
 
-    //"/api/register" needs to be changed
-    const response = await fetch("/api/register", requestOptions);
-    const data = await response.json();
+    try {
 
-    if (!response.ok) {
-      setErrorMessage(data.detail);
+      //CHANGE 'register' TO PROPER DIRECTORY PLS
+
+      const response = await fetch("/api/register", requestOptions);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(data.detail);
+      } else {
+        setSuccessMessage("Password changed successfully.");
+        setErrorMessage("");
+        navigate("/");
+      }
+    } catch (error) {
+      setErrorMessage("An error occurred while changing password.");
     }
   };
 
@@ -34,17 +43,13 @@ const NewPass = () => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {
       submitPassChange();
-      setSuccessMessage("Password changed successfully.");
-      setErrorMessage("");
-      navigate("/");
-     } else {
-    if (password.length <= 5) {
-      setErrorMessage("Password must be at least 6 characters long");
-      setSuccessMessage("");
     } else {
-      setErrorMessage("Password and confirmation password do not match");
+      if (password.length <= 5) {
+        setErrorMessage("Password must be at least 6 characters long");
+      } else {
+        setErrorMessage("Password and confirmation password do not match");
+      }
       setSuccessMessage("");
-    }
     }
   };
 

@@ -10,36 +10,39 @@ const Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const submitRegistration = async () => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, hashed_password: password }),
-    };
-
-    const response = await fetch("/api/register", requestOptions);
-    const data = await response.json();
-
-    if (!response.ok) {
-      setErrorMessage(data.detail);
-    }
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email, hashed_password: password }),
   };
+
+  const response = await fetch("/api/register", requestOptions);
+  const data = await response.json();
+
+  if (response.ok) {
+    setSuccessMessage("Please check your email for verification link.");
+    setErrorMessage("");
+  } else {
+    setErrorMessage(data.detail);
+    setSuccessMessage("");
+  }
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {
       submitRegistration();
-      setSuccessMessage("Please check your email for verification link.");
-      setErrorMessage("");
-     } else {
-    if (password.length <= 5) {
-      setErrorMessage("Password must be at least 6 characters long");
-      setSuccessMessage("");
     } else {
-      setErrorMessage("Password and confirmation password do not match");
-      setSuccessMessage("");
-    }
+      if (password.length <= 5) {
+        setErrorMessage("Password must be at least 6 characters long");
+        setSuccessMessage("");
+      } else {
+        setErrorMessage("Password and confirmation password do not match");
+        setSuccessMessage("");
+      }
     }
   };
+
 
   return (
     <div className="column">
