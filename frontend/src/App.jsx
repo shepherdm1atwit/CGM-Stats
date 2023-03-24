@@ -1,6 +1,7 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import AppMain from "./pages/AppMain";
 import VerifyEmail from "./pages/VerifyEmail";
+import ResetPassword from "./pages/ResetPassword";
 
 
 function App(){
@@ -11,6 +12,7 @@ function App(){
                 <Route path='verifyemail' element={<VerifyEmail />}>
                     <Route path=':verificationCode' element={<VerifyEmail />} />
                 </Route>
+                <Route path='resetpassword' element={<ResetPassword />} />
                 <Route path='*' element={<Navigate to='/' />} />
             </Routes>
         </>
