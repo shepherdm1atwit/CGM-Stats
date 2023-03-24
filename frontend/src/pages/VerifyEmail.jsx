@@ -1,7 +1,6 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 
-import { UserContext } from "../context/UserContext";
 import ErrorMessage from "../components/ErrorMessage";
 
 

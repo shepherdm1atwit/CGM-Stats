@@ -12,7 +12,9 @@ function App(){
                 <Route path='verifyemail' element={<VerifyEmail />}>
                     <Route path=':verificationCode' element={<VerifyEmail />} />
                 </Route>
-                <Route path='resetpassword' element={<ResetPassword />} />
+                <Route path='resetpassword' element={<ResetPassword />}>
+                    <Route path=':resetCode' element={<VerifyEmail />} />
+                </Route>
                 <Route path='*' element={<Navigate to='/' />} />
             </Routes>
         </>

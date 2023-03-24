@@ -43,8 +43,16 @@ async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.g
 
 
 @app.post('/resetrequest')
-async def reset_password(email: schemas.ForgotPassEmail):#, db: Session = Depends(services.get_db)):
-    print(email.email)
+async def reset_request(email: schemas.ForgotPassEmail):#, db: Session = Depends(services.get_db)):
+    print(f"email: {email.email}")
     return {"email": email.email}
+
+
+@app.post('/resetpassword')
+async def reset_password(msg: schemas.ResetPass):#, db: Session = Depends(services.get_db)):
+    print(f"password: {msg.password}")
+    print(f"password: {msg.token}")
+
+    return {"message": "all good"}
 
 

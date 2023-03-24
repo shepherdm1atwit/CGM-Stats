@@ -1,40 +1,36 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import ErrorMessage from "./ErrorMessage";
 import { useNavigate, useParams } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
 
 const NewPass = () => {
-  const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
-  const { verificationCode } = useParams();
+  const { resetCode } = useParams();
   const [errorMessage, setErrorMessage] = useState("");
-  const [, setToken] = useContext(UserContext);
   const [successMessage, setSuccessMessage] = useState("");
 
   const submitPassChange = async () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hashed_password: password }),
+      body: JSON.stringify({ token: resetCode, password: password }),
     };
 
     try {
-
-      //CHANGE 'register' TO PROPER DIRECTORY PLS
-
-      const response = await fetch("/api/register", requestOptions);
+      const response = await fetch("/api/resetpassword", requestOptions);
       const data = await response.json();
 
       if (!response.ok) {
         setErrorMessage(data.detail);
-      } else {
+      }
+      else {
         setSuccessMessage("Password changed successfully.");
         setErrorMessage("");
         navigate("/");
       }
-    } catch (error) {
+    }
+    catch (error) {
       setErrorMessage("An error occurred while changing password.");
     }
   };
@@ -43,10 +39,12 @@ const NewPass = () => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {
       submitPassChange();
-    } else {
+    }
+    else {
       if (password.length <= 5) {
         setErrorMessage("Password must be at least 6 characters long");
-      } else {
+      }
+      else {
         setErrorMessage("Password and confirmation password do not match");
       }
       setSuccessMessage("");
