@@ -28,27 +28,64 @@ async def get_user_by_email(email: str, db: Session):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-async def generate_email(db_user: models.User, request: Request):
+async def generate_email(db_user: models.User, topic: str, request: Request):
     token = randbytes(10)
-    hashedCode = sha256()
-    hashedCode.update(token)
-    verification_code = hashedCode.hexdigest()
+    hashed_code = sha256()
+    hashed_code.update(token)
+    verification_code = hashed_code.hexdigest()
 
     db_user.verification_code = verification_code
 
-    user_dict = {"email": db_user.email, "id": db_user.id}
+    user_dict = {"email": db_user.email, "name": db_user.name}
 
-
-    # TESTING ONLY
     domain = settings.HOST_DOMAIN
-    url = f"{request.url.scheme}://{domain}/verifyemail/{token.hex()}"
 
-    return await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
+    if topic == "passreset":
+        url = f"{request.url.scheme}://{domain}/resetpassword/{token.hex()}"
+        return await Email(user_dict, url, [EmailStr(db_user.email)]).sendResetCode()
+    elif topic == "verifemail":
+        url = f"{request.url.scheme}://{domain}/verifyemail/{token.hex()}"
+        return await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
+
+
+async def send_password_reset(email: str, request: Request, db: Session):
+    db_user = db.query(models.User).filter_by(email=email).filter(models.User.verified_email == True).first()
+    if db_user is None:
+        return {"status": "success"}
+
+
+    try:
+        await generate_email(db_user=db_user, topic="passreset", request=request)
+        db.commit()
+        db.refresh(db_user)
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500, detail='Error sending verification email')
+
+    return {"status": "success"}
+
+
+async def change_password(token: str, password: str, db: Session):
+    hashed_code = sha256()
+    hashed_code.update(bytes.fromhex(token))
+    verification_code = hashed_code.hexdigest()
+
+    user = db.query(models.User).filter(models.User.verification_code == verification_code).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=403, detail='Invalid password reset code')
+    else:
+        user.verification_code = None
+        user.hashed_password = bcrypt.hash(password)
+        db.commit()
+        return {"status": "success"}
 
 
 async def create_user(user: schemas.CreateUser, request: Request, db: Session):
     user = models.User(
-        email=user.email, hashed_password=bcrypt.hash(user.hashed_password)
+        email=user.email, name=user.name, hashed_password=bcrypt.hash(user.hashed_password)
     )
     db.add(user)
     db.commit()
@@ -56,16 +93,15 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session):
     db_user = db.query(models.User).filter_by(email=user.email).filter(models.User.verified_email == False).first()
 
     try:
-        await generate_email(db_user=db_user, request=request)
+        await generate_email(db_user=db_user, topic="verifemail", request=request)
         db.commit()
         db.refresh(db_user)
 
     except Exception as error:
-        print(error)
         raise HTTPException(
             status_code=500, detail='Error sending verification email')
 
-    return {"status": "success", "user": schemas.User.from_orm(user)}
+    return {"status": "success"}
 
 
 async def verify_email(token: str, db: Session):
@@ -73,7 +109,7 @@ async def verify_email(token: str, db: Session):
     hashed_code.update(bytes.fromhex(token))
     verification_code = hashed_code.hexdigest()
 
-    user: models.User = db.query(models.User).filter(models.User.verification_code == verification_code).first()
+    user = db.query(models.User).filter(models.User.verification_code == verification_code).first()
 
     if not user:
         raise HTTPException(
@@ -82,7 +118,7 @@ async def verify_email(token: str, db: Session):
         user.verification_code = None
         user.verified_email = True
         db.commit()
-        return await create_token(user) #change this?
+        return {"status": "success"}
 
 
 async def authenticate_user(email: str, password: str, db: Session):

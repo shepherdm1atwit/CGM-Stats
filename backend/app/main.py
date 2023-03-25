@@ -5,6 +5,7 @@ import schemas
 
 app = FastAPI()
 
+
 @app.get("/api")
 async def root():
     return {"message": "CGM Stats"}
@@ -16,9 +17,9 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session = 
     if db_user:
         raise HTTPException(status_code=400, detail="Email already in use")
 
-    usr = await services.create_user(user=user, request=request, db=db)
+    print(user.dict())
 
-    return {"message": "Account created successfully"}
+    return await services.create_user(user=user, request=request, db=db)
 
 
 @app.post("/token")
@@ -43,16 +44,10 @@ async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.g
 
 
 @app.post('/resetrequest')
-async def reset_request(email: schemas.ForgotPassEmail):#, db: Session = Depends(services.get_db)):
-    print(f"email: {email.email}")
-    return {"email": email.email}
+async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
+    return await services.send_password_reset(email=email.email, request=request, db=db)
 
 
 @app.post('/resetpassword')
-async def reset_password(msg: schemas.ResetPass):#, db: Session = Depends(services.get_db)):
-    print(f"password: {msg.password}")
-    print(f"password: {msg.token}")
-
-    return {"message": "all good"}
-
-
+async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
+    return await services.change_password(token=msg.token, password=msg.password, db=db)

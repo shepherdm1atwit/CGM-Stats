@@ -4,7 +4,6 @@ from pydantic import EmailStr, BaseModel
 from config import settings
 from typing import List
 
-
 env = Environment(
     loader=FileSystemLoader(searchpath="./templates"),
     autoescape=select_autoescape(['html', 'xml'])
@@ -17,8 +16,8 @@ class EmailSchema(BaseModel):
 
 class Email:
     def __init__(self, user: dict, url: str, email: List[EmailStr]):
-        self.name = user['id']
-        self.sender = 'CGM Stats <admin@admin.com>'
+        self.name = user['name']
+        self.sender = 'CGM Stats <admin@admin.com>'  # TODO: change this address to a real email
         self.email = email
         self.url = url
         pass
@@ -58,4 +57,7 @@ class Email:
         await fm.send_message(message)
 
     async def sendVerificationCode(self):
-        await self.sendMail('Your verification code', 'verification')
+        await self.sendMail('CGMStats: Verify your email', 'verification')
+
+    async def sendResetCode(self):
+        await self.sendMail('CGMStats: Your password reset link', 'password_reset')

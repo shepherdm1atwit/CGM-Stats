@@ -6,6 +6,7 @@ class UserBase(BaseModel):
 
 
 class CreateUser(UserBase):
+    name: str
     hashed_password: str
 
     class Config:
@@ -13,6 +14,7 @@ class CreateUser(UserBase):
 
 
 class User(UserBase):
+    name: str
     id: int
 
     class Config:

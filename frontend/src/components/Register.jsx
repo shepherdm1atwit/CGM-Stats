@@ -4,6 +4,7 @@ import ErrorMessage from "./ErrorMessage";
 
 const Register = () => {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmationPassword, setConfirmationPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -13,7 +14,7 @@ const Register = () => {
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email, hashed_password: password }),
+    body: JSON.stringify({ email: email, name: name, hashed_password: password }),
   };
 
   const response = await fetch("/api/register", requestOptions);
@@ -57,6 +58,20 @@ const Register = () => {
               autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="input"
+              required
+            />
+          </div>
+        </div>
+        <div className="field">
+          <label className="label">First Name</label>
+          <div className="control">
+            <input
+              type="text"
+              placeholder="Enter name"
+              autoComplete="given-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="input"
               required
             />

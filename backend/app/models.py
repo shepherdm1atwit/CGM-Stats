@@ -7,6 +7,7 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
+    name = Column(String)
     hashed_password = Column(String)
     verification_code = Column(String, default=None)
     verified_email = Column(Boolean, default=False)
