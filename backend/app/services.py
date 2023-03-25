@@ -40,10 +40,10 @@ async def generate_email(db_user: models.User, topic: str, request: Request):
 
     domain = settings.HOST_DOMAIN
 
-    if topic == "passreset":
+    if topic == "password_reset":
         url = f"{request.url.scheme}://{domain}/resetpassword/{token.hex()}"
         return await Email(user_dict, url, [EmailStr(db_user.email)]).sendResetCode()
-    elif topic == "verifemail":
+    elif topic == "verify_email":
         url = f"{request.url.scheme}://{domain}/verifyemail/{token.hex()}"
         return await Email(user_dict, url, [EmailStr(db_user.email)]).sendVerificationCode()
 
@@ -55,7 +55,7 @@ async def send_password_reset(email: str, request: Request, db: Session):
 
 
     try:
-        await generate_email(db_user=db_user, topic="passreset", request=request)
+        await generate_email(db_user=db_user, topic="password_reset", request=request)
         db.commit()
         db.refresh(db_user)
 
@@ -93,13 +93,15 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session):
     db_user = db.query(models.User).filter_by(email=user.email).filter(models.User.verified_email == False).first()
 
     try:
-        await generate_email(db_user=db_user, topic="verifemail", request=request)
+        await generate_email(db_user=db_user, topic="verify_email", request=request)
         db.commit()
-        db.refresh(db_user)
 
-    except Exception as error:
-        raise HTTPException(
-            status_code=500, detail='Error sending verification email')
+    except Exception:
+        db.refresh(db_user)
+        if db_user:
+            db.delete(db_user)
+            db.commit()
+        raise HTTPException(status_code=500, detail="Error sending verification email, account not created.")
 
     return {"status": "success"}
 
