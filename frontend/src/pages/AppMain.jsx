@@ -8,6 +8,7 @@ import ForgotPassword from "../components/ForgotPassword";
 const AppMain = () => {
     const [message, setMessage] = useState("");
     const [token] = useContext(UserContext);
+    const [dexcomConnected, setDexcomConnected] = useState(false);
 
     const getWelcomeMessage = async () => {
         const requestOptions = {
@@ -23,6 +24,24 @@ const AppMain = () => {
             console.log("something messed up");
         } else {
             setMessage(data.message);
+        }
+    };
+
+        const checkDexcomToken = async () => {
+        const requestOptions = {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    };
+        //made up endpoint for an example
+        const response = await fetch("/api/dexcom/check-token", requestOptions);
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.log("No token detected");
+        } else {
+            setDexcomConnected(data.connected);
         }
     };
 
@@ -81,7 +100,23 @@ const AppMain = () => {
               {showForgotPassword && <ForgotPassword />}
             </>
           ) : (
-            <p> Hello there </p>
+                <>
+              <button
+                className="button is-primary"
+                style={{ width: "200px", margin: "0 auto" }}
+                    onClick={async () => {
+                     await checkDexcomToken();
+                        if (dexcomConnected) {
+                            // Show other components here
+                        } else {
+                            //made up endpoint as an example
+                            window.location.href = "/api/dexcom/login";
+                        }
+                    }}
+                    >
+                    Connect with Dexcom
+                    </button>
+              </>
           )}
         </div>
         <div className="column"></div>
