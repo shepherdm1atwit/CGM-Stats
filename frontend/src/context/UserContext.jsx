@@ -4,6 +4,7 @@ export const UserContext = createContext();
 
 export const UserProvider = (props) => {
   const [token, setToken] = useState(localStorage.getItem("CGMStatsToken"));
+  const [dexcomConnected, setDexcomConnected] = useState("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -26,7 +27,7 @@ export const UserProvider = (props) => {
   }, [token]);
 
   return (
-    <UserContext.Provider value={[token, setToken]}>
+    <UserContext.Provider value={{authToken: [token, setToken],dexConnect: [dexcomConnected, setDexcomConnected]}}>
       {props.children}
     </UserContext.Provider>
   );

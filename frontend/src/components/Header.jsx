@@ -3,7 +3,10 @@ import React, { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 
 const Header = ({ title }) => {
-  const [token, setToken] = useContext(UserContext);
+  const {authToken, dexConnect} = useContext(UserContext);
+    const [token, setToken] = authToken;
+    const [dexConnected, setDexConnected] = dexConnect;
+
 
   const handleLogout = () => {
     setToken(null);

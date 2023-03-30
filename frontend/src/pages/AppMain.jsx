@@ -4,11 +4,13 @@ import Header from "../components/Header";
 import Register from "../components/Register";
 import Login from "../components/Login";
 import ForgotPassword from "../components/ForgotPassword";
+import DexcomConnect from "../components/DexcomConnect";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
-    const [token] = useContext(UserContext);
-    const [dexcomConnected, setDexcomConnected] = useState(false);
+    const {authToken, dexConnect} = useContext(UserContext);
+    const [token, setToken] = authToken;
+    const [dexConnected, setDexConnected] = dexConnect;
 
     const getWelcomeMessage = async () => {
         const requestOptions = {
@@ -34,15 +36,7 @@ const AppMain = () => {
             "Content-Type": "application/json",
         },
     };
-        //made up endpoint for an example
-        const response = await fetch("/api/dexcom/check-token", requestOptions);
-        const data = await response.json();
 
-        if (!response.ok) {
-            console.log("No token detected");
-        } else {
-            setDexcomConnected(data.connected);
-        }
     };
 
     useEffect(() => {
@@ -56,9 +50,10 @@ const AppMain = () => {
    return (
     <>
       <Header title={message} />
-      <div className="columns">
-        <div className="column"></div>
-        <div className="column m-5 is-two-thirds">
+      <div className="columns is-centered is-mobile">
+
+
+        <div className="column m-5 is-8 is-offset-2">
           {!token ? (
             <>
               <div className="buttons">
@@ -101,25 +96,14 @@ const AppMain = () => {
             </>
           ) : (
                 <>
-              <button
-                className="button is-primary"
-                style={{ width: "200px", margin: "0 auto" }}
-                    onClick={async () => {
-                     await checkDexcomToken();
-                        if (dexcomConnected) {
-                            // Show other components here
-                        } else {
-                            //made up endpoint as an example
-                            window.location.href = "/api/dexcom/login";
-                        }
-                    }}
-                    >
-                    Connect with Dexcom
-                    </button>
+                    <DexcomConnect />
               </>
+
           )}
         </div>
-        <div className="column"></div>
+
+
+
       </div>
     </>
   );

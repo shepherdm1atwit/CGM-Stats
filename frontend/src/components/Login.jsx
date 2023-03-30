@@ -6,7 +6,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [, setToken] = useContext(UserContext);
+  const {authToken, dexConnect} = useContext(UserContext);
+  const [,setToken] = authToken;
 
   const submitLogin = async () => {
     const requestOptions = {
