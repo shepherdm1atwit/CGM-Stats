@@ -35,7 +35,7 @@ class Email:
             USE_CREDENTIALS=True,
             VALIDATE_CERTS=True
         )
-        # Generate the HTML template base on the template name
+        # Generate email based on template (specified in sending functions below)
         template = env.get_template(f'{template}.html')
 
         html = template.render(

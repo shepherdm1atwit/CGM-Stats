@@ -21,9 +21,6 @@ const VerifyEmail = () => {
 
         if (!response.ok) {
             setErrorMessage(data.detail);
-        } else {
-            //setToken(data.access_token);
-            console.log("Successful Verification");
         }
     };
 

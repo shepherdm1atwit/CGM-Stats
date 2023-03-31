@@ -4,8 +4,8 @@ import { UserContext } from "../context/UserContext";
 
 const Header = ({ title }) => {
   const {authToken, dexConnect} = useContext(UserContext);
-    const [token, setToken] = authToken;
-    const [dexConnected, setDexConnected] = dexConnect;
+  const [token, setToken] = authToken;
+  const [dexConnected, setDexConnected] = dexConnect;
 
 
   const handleLogout = () => {
