@@ -1,11 +1,12 @@
-from fastapi import Depends, security, HTTPException, Request
-from sqlalchemy.orm import Session
 import database
 import models
 import schemas
+import jwt
+import requests
+from fastapi import Depends, security, HTTPException, Request
+from sqlalchemy.orm import Session
 from config import settings
 from passlib.hash import bcrypt
-import jwt
 from random import randbytes
 from pydantic import EmailStr
 from email_utils import Email
@@ -25,6 +26,10 @@ def get_db():
 
 
 async def get_user_by_email(email: str, db: Session):
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
+async def get_user_by_token(token: str, db: Session):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
@@ -52,7 +57,6 @@ async def send_password_reset(email: str, request: Request, db: Session):
     db_user = db.query(models.User).filter_by(email=email).filter(models.User.verified_email == True).first()
     if db_user is None:
         return {"status": "success"}
-
 
     try:
         await generate_email(db_user=db_user, topic="password_reset", request=request)
@@ -144,6 +148,55 @@ async def create_token(user: models.User):
     token = jwt.encode(db_user.dict(), JWT_SECRET)
 
     return dict(access_token=token, token_type="bearer")
+
+
+async def check_dexcom_connection(user: schemas.User, db: Session):
+    try:
+        db_user = db.query(models.User).get(user.id)
+        url = settings.DEXCOM_URL + "v3/users/self/devices"
+        headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        if "fault" in data:
+            try:
+                await refresh_dexcom_tokens(db_user=db_user, db=db)
+            except:
+                return False
+            db.refresh(db_user)
+            headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
+            response = requests.get(url, headers=headers)
+            data = response.json()
+            if "fault" not in data:
+                return True
+            return False
+        return True
+    except:
+        print("check_dexcom....")
+        raise HTTPException(status_code=500, detail="Problem checking dexcom connection.")
+
+
+async def refresh_dexcom_tokens(db_user: models.User, db: Session):
+    try:
+        url = settings.DEXCOM_URL + "v2/oauth2/token"
+        payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": db_user.dex_refresh_token,
+            "redirect_uri": "http://" + settings.HOST_DOMAIN,
+            "client_id": settings.DEXCOM_CLIENT_ID,
+            "client_secret": settings.DEXCOM_CLIENT_SECRET
+        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        response = requests.post(url, data=payload, headers=headers)
+        data = response.json()
+    except:
+        print("refresh_dexcom....")
+        raise HTTPException(status_code=500, detail="Error refreshing tokens.")
+    if "error" in data:
+        print("refresh_dexcom.... error in data")
+        raise HTTPException(status_code=500, detail="Error refreshing tokens.")
+    db_user.dex_access_token = data["access_token"]
+    db_user.dex_refresh_token = data["refresh_token"]
+    db.commit()
 
 
 async def get_current_user(

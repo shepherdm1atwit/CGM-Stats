@@ -7,3 +7,4 @@ PyJWT
 fastapi_mail
 jinja2
 uvicorn
+requests

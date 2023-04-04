@@ -1,24 +1,26 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useContext, useEffect} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import ErrorMessage from "../components/ErrorMessage";
+import {UserContext} from "../context/UserContext";
 
 
 const VerifyDexcom = () => {
     const navigate = useNavigate();
+    const {authToken,} = useContext(UserContext);
+    const [token,] = authToken;
     const [queryParameters] = useSearchParams();
     const [errorMessage, setErrorMessage] = useState("");
 
-    const submitVerify = async () => {
+    const submitDexAuth = async () => {
+        console.log(queryParameters.get("code"));
         const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dexAuthCode: queryParameters.get("code") }),
-
+            body: JSON.stringify({ token: token, code: queryParameters.get("code") }),
         };
 
-        const response = await fetch("/api/verifydexcom", requestOptions);
+        const response = await fetch("/api/authdexcom", requestOptions);
         const data = await response.json();
-        console.log(queryParameters.get("code"));
 
         if (!response.ok) {
             setErrorMessage(data.detail);
@@ -28,7 +30,7 @@ const VerifyDexcom = () => {
     };
 
     useEffect(() => {
-        submitVerify()
+        submitDexAuth()
         navigate("/");
     }, );
 

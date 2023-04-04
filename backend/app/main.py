@@ -1,7 +1,12 @@
 from fastapi import Depends, FastAPI, HTTPException, Request, security
 from sqlalchemy.orm import Session
+from config import settings
 import services
 import schemas
+import jwt
+import requests
+import models
+
 
 app = FastAPI()
 
@@ -36,6 +41,48 @@ async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends
 @app.get("/me", response_model=schemas.User)
 async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
+
+
+@app.get("/dexconnected")
+async def check_user_dex_connection(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    return await services.check_dexcom_connection(user=user, db=db)
+
+
+@app.post("/authdexcom")
+async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, db: Session = Depends(services.get_db)):
+    try:
+        url = settings.DEXCOM_URL+"v2/oauth2/token"
+
+        payload = {
+            "grant_type": "authorization_code",
+            "code": authcode.code,
+            "redirect_uri": "http://" + settings.HOST_DOMAIN,
+            "client_id": settings.DEXCOM_CLIENT_ID,
+            "client_secret": settings.DEXCOM_CLIENT_SECRET
+        }
+
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        response = requests.post(url, data=payload, headers=headers)
+
+        data = response.json()
+    except:
+        raise HTTPException(
+            status_code=500, detail="Error sending authentication request"
+        )
+
+    try:
+        payload = jwt.decode(authcode.token, settings.JWT_PRIVATE_KEY, algorithms=["HS256"])
+        user = db.query(models.User).get(payload["id"])
+        user.dex_access_token = data["access_token"]
+        user.dex_refresh_token = data["refresh_token"]
+        db.commit()
+    except:
+        raise HTTPException(
+            status_code=500, detail="Error inserting access/refresh token into user in database"
+        )
+
+    return {"status": "success"}
 
 
 @app.post('/verifyemail')

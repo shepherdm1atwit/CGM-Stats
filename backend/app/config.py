@@ -7,6 +7,10 @@ class Settings(BaseSettings):
 
     HOST_DOMAIN: str
 
+    DEXCOM_URL: str
+    DEXCOM_CLIENT_ID: str
+    DEXCOM_CLIENT_SECRET: str
+
     EMAIL_HOST: str
     EMAIL_PORT: int
     EMAIL_USERNAME: str

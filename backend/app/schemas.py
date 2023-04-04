@@ -21,6 +21,11 @@ class User(UserBase):
         orm_mode = True
 
 
+class DexcomAuthCode(BaseModel):
+    token: str
+    code: str
+
+
 class VerifyEmail(BaseModel):
     token: str
 

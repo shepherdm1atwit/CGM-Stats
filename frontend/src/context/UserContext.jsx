@@ -21,7 +21,20 @@ export const UserProvider = (props) => {
       if (!response.ok) {
         setToken(null);
       }
-      localStorage.setItem("CGMStatsToken", token);
+      else {
+        localStorage.setItem("CGMStatsToken", token);
+        const requestOptions = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        };
+
+        const response = await fetch("/api/dexconnected", requestOptions);
+        const data = await response.json()
+        setDexcomConnected(data);
+      }
     };
     fetchUser();
   }, [token]);
