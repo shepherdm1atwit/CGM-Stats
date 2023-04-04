@@ -93,8 +93,10 @@ const AppMain = () => {
             </>
           ) : (
             <>
+                <div className="has-text-centered">
               <a href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access" className="button is-primary"> Connect to Dexcom </a>
-            </>
+                    </div>
+                </>
           )}
         </div>
       </div>
