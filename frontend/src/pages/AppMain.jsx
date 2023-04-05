@@ -1,42 +1,48 @@
-import React, {useContext, useEffect, useState} from "react";
-import {UserContext} from "../context/UserContext";
+import React, { useContext, useEffect, useState } from "react";
+import { UserContext } from "../context/UserContext";
 import Header from "../components/Header";
 import Register from "../components/Register";
 import Login from "../components/Login";
 import ForgotPassword from "../components/ForgotPassword";
+import Sidebar from "../components/Sidebar";
 
 const AppMain = () => {
-    const [message, setMessage] = useState("");
-    const {authToken, dexConnect} = useContext(UserContext);
-    const [token, ] = authToken;
-    const [dexConnected, ] = dexConnect;
+  const [message, setMessage] = useState("");
+  const { authToken, dexConnect } = useContext(UserContext);
+  const [token,] = authToken;
+  const [dexConnected,] = dexConnect;
 
-    const getWelcomeMessage = async () => {
-        const requestOptions = {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        };
-        const response = await fetch("/api/api", requestOptions);
-        const data = await response.json();
-
-        if (!response.ok) {
-            console.log("something messed up");
-        } else {
-            setMessage(data.message);
-        }
+  const getWelcomeMessage = async () => {
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     };
+    const response = await fetch("/api/api", requestOptions);
+    const data = await response.json();
 
-    useEffect(() => {
-        getWelcomeMessage();
-    }, []);
+    if (!response.ok) {
+      console.log("something messed up");
+    } else {
+      setMessage(data.message);
+    }
+  };
 
-    const [showRegister, setShowRegister] = useState(false);
-    const [showLogin, setShowLogin] = useState(true);
-    const [showForgotPassword, setShowForgotPassword] = useState(false);
+  useEffect(() => {
+    getWelcomeMessage();
+  }, []);
 
-   return (
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+
+  useEffect(() => {
+    setShowSidebar(dexConnected);
+  }, [dexConnected]);
+
+  return (
     <>
       <Header title={message} />
       <div className="columns is-centered is-mobile">
@@ -82,12 +88,27 @@ const AppMain = () => {
               {showForgotPassword && <ForgotPassword />}
             </>
           ) : (
-              <div className="has-text-centered">
-                {!dexConnected
-                  ? (<a href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access" className="button is-primary"> Connect to Dexcom </a>)
-                  : (<p>LOOK, NO BUTTON!</p>)
-                }
-              </div>
+            <div className="has-text-centered">
+              {!dexConnected ? (
+                <a
+                  href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access"
+                  className="button is-primary"
+                >
+                  {" "}
+                  Connect to Dexcom{" "}
+                </a>
+              ) : (
+                <>
+                  <button
+                    className="button is-primary"
+                    onClick={() => setShowSidebar(!showSidebar)}
+                  >
+                    ☰
+                  </button>
+                  {showSidebar && <Sidebar />}
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
