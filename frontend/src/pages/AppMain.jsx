@@ -30,16 +30,9 @@ const AppMain = () => {
         getWelcomeMessage();
     }, []);
 
-    function printToken(){
-        console.log(token)
-    }
-
    return (
     <>
       <Header title={message} />
-        <button className="button" type="button" onClick={printToken}>
-          print token
-        </button>
       <div className="columns is-centered is-mobile">
         <div className="column m-5 is-8 is-offset-2">
           {!token ? (
