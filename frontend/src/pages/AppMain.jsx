@@ -8,8 +8,8 @@ import ForgotPassword from "../components/ForgotPassword";
 const AppMain = () => {
     const [message, setMessage] = useState("");
     const {authToken, dexConnect} = useContext(UserContext);
-    const [token, setToken] = authToken;
-    const [dexConnected, setDexConnected] = dexConnect;
+    const [token, ] = authToken;
+    const [dexConnected, ] = dexConnect;
 
     const getWelcomeMessage = async () => {
         const requestOptions = {
@@ -26,16 +26,6 @@ const AppMain = () => {
         } else {
             setMessage(data.message);
         }
-    };
-
-        const checkDexcomToken = async () => {
-        const requestOptions = {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-        },
-    };
-
     };
 
     useEffect(() => {
@@ -92,11 +82,12 @@ const AppMain = () => {
               {showForgotPassword && <ForgotPassword />}
             </>
           ) : (
-            <>
-                <div className="has-text-centered">
-              <a href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access" className="button is-primary"> Connect to Dexcom </a>
-                    </div>
-                </>
+              <div className="has-text-centered">
+                {!dexConnected
+                  ? (<a href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access" className="button is-primary"> Connect to Dexcom </a>)
+                  : (<p>LOOK, NO BUTTON!</p>)
+                }
+              </div>
           )}
         </div>
       </div>
