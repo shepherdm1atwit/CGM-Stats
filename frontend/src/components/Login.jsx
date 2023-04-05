@@ -7,19 +7,21 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const {authToken, dexConnect} = useContext(UserContext);
-  const [,setToken] = authToken;
+  const [token ,setToken] = authToken;
 
-  const submitLogin = async () => {
-    const requestOptions = {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+        const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: JSON.stringify(
         `grant_type=&username=${email}&password=${password}&scope=&client_id=&client_secret=`
       ),
     };
-
+    console.log(token)
     const response = await fetch("/api/token", requestOptions);
     const data = await response.json();
+    console.log(token)
 
     if (!response.ok) {
       setErrorMessage(data.detail);
@@ -27,16 +29,6 @@ const Login = () => {
       setToken(data.access_token);
     }
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    submitLogin();
-  };
-
- // const handleForgotPassword = (e) => {
- //   e.preventDefault();
- //   console.log("show forgot password");
- // }
 
   return (
     <div className="column">

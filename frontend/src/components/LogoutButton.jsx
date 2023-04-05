@@ -4,13 +4,12 @@ import { UserContext } from "../context/UserContext";
 
 const LogoutButton = ({ title }) => {
   const {authToken, } = useContext(UserContext);
-  const [, setToken] = authToken;
+  const [token, setToken] = authToken;
 
 
   const handleLogout = () => {
-    console.log(token)
     setToken(null);
-    console.log(token)
+    localStorage.setItem("CGMStatsToken", null);
   };
 
   return (
