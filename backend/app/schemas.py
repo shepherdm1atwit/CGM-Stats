@@ -22,7 +22,6 @@ class User(UserBase):
 
 
 class DexcomAuthCode(BaseModel):
-    token: str
     code: str
 
 

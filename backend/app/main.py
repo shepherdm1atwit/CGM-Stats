@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from config import settings
 import services
 import schemas
-import jwt
 import requests
 import models
 
@@ -21,8 +20,6 @@ async def create_user(user: schemas.CreateUser, request: Request, db: Session = 
     db_user = await services.get_user_by_email(user.email, db)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already in use")
-
-    print(user.dict())
 
     return await services.create_user(user=user, request=request, db=db)
 
@@ -49,7 +46,7 @@ async def check_user_dex_connection(user: schemas.User = Depends(services.get_cu
 
 
 @app.post("/authdexcom")
-async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, db: Session = Depends(services.get_db)):
+async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
     try:
         url = settings.DEXCOM_URL+"v2/oauth2/token"
 
@@ -72,8 +69,7 @@ async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, db: Session = De
         )
 
     try:
-        payload = jwt.decode(authcode.token, settings.JWT_PRIVATE_KEY, algorithms=["HS256"])
-        user = db.query(models.User).get(payload["id"])
+        user = db.query(models.User).get(user.id)
         user.dex_access_token = data["access_token"]
         user.dex_refresh_token = data["refresh_token"]
         db.commit()
@@ -84,6 +80,19 @@ async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, db: Session = De
 
     return {"status": "success"}
 
+@app.delete('/disconnectdexcom')
+async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    db_user = db.query(models.User).get(user.id)
+    try:
+        db_user.dex_access_token = None
+        db_user.dex_refresh_token = None
+        db.commit()
+    except:
+
+        raise HTTPException(
+            status_code=500, detail="Error removing dexcom tokens from database"
+        )
+    return {"Status": "Dexcom account successfully disconnected."}
 
 @app.post('/verifyemail')
 async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):

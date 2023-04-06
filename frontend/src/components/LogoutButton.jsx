@@ -9,7 +9,7 @@ const LogoutButton = ({ title }) => {
 
   const handleLogout = () => {
     setToken(null);
-    localStorage.setItem("CGMStatsToken", null);
+    sessionStorage.setItem("CGMStatsToken", null);
   };
 
   return (

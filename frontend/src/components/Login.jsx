@@ -18,10 +18,8 @@ const Login = () => {
         `grant_type=&username=${email}&password=${password}&scope=&client_id=&client_secret=`
       ),
     };
-    console.log(token)
     const response = await fetch("/api/token", requestOptions);
     const data = await response.json();
-    console.log(token)
 
     if (!response.ok) {
       setErrorMessage(data.detail);

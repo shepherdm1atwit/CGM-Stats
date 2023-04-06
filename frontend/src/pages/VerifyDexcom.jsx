@@ -12,11 +12,13 @@ const VerifyDexcom = () => {
     const [errorMessage, setErrorMessage] = useState("");
 
     const submitDexAuth = async () => {
-        console.log(queryParameters.get("code"));
         const requestOptions = {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: token, code: queryParameters.get("code") }),
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ code: queryParameters.get("code") }),
         };
 
         const response = await fetch("/api/authdexcom", requestOptions);

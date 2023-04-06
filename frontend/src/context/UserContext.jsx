@@ -3,7 +3,7 @@ import React, { createContext, useEffect, useState } from "react";
 export const UserContext = createContext();
 
 export const UserProvider = (props) => {
-  const [token, setToken] = useState(localStorage.getItem("CGMStatsToken"));
+  const [token, setToken] = useState(sessionStorage.getItem("CGMStatsToken"));
   const [dexcomConnected, setDexcomConnected] = useState("");
   const value = {authToken: [token, setToken],dexConnect: [dexcomConnected, setDexcomConnected]}
 
@@ -23,7 +23,7 @@ export const UserProvider = (props) => {
         setToken(null);
       }
       else {
-        localStorage.setItem("CGMStatsToken", token);
+        sessionStorage.setItem("CGMStatsToken", token);
         const requestOptions = {
           method: "GET",
           headers: {
