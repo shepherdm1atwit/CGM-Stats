@@ -6,8 +6,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {authToken, dexConnect} = useContext(UserContext);
-  const [token ,setToken] = authToken;
+  const {authToken,} = useContext(UserContext);
+  const [,setToken] = authToken;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,9 +62,7 @@ const Login = () => {
         </div>
         <ErrorMessage message={errorMessage} />
         <br />
-        <button className="button is-primary" type="submit">
-          Login
-        </button>
+        <button className="button is-primary" type="submit">Login</button>
       </form>
     </div>
   );

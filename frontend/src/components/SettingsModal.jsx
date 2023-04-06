@@ -24,7 +24,7 @@ const SettingsModal = ({ onClose }) => {
     setLowestGlucose(event.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e) => {
     // Here you can send the highestGlucose and lowestGlucose values to the backend
     console.log("Highest glucose value:", highestGlucose);
     console.log("Lowest glucose value:", lowestGlucose);
@@ -41,7 +41,7 @@ const SettingsModal = ({ onClose }) => {
         <section className="modal-card-body">
 
           <div className="field">
-            <label className="label">Highest Glucose</label>
+            <label className="label">Highest Preferred Blood Glucose (mg/dL)</label>
             <div className="control">
               <input
                 className="input"
@@ -52,7 +52,7 @@ const SettingsModal = ({ onClose }) => {
             </div>
           </div>
           <div className="field">
-            <label className="label">Lowest Glucose</label>
+            <label className="label">Lowest Preferred Blood Glucose (mg/dL)</label>
             <div className="control">
               <input
                 className="input"
@@ -65,7 +65,7 @@ const SettingsModal = ({ onClose }) => {
           <DisconnectDexcomButton />
         </section>
         <footer className="modal-card-foot">
-          <button className="button is-success" onClick={handleSubmit}>Save changes</button>
+          <button className="button is-success" type="submit" onClick={handleSubmit}>Save changes</button>
           <button className="button" onClick={cancelModal}>Cancel</button>
         </footer>
       </div>

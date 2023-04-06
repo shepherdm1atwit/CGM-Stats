@@ -8,8 +8,8 @@ import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
 const AppMain = () => {
     const [message, setMessage] = useState("");
     const {authToken, dexConnect} = useContext(UserContext);
-    const [token, setToken] = authToken;
-    const [dexcomConnected, setDexcomConnected] = dexConnect;
+    const [token,] = authToken;
+    const [dexcomConnected,] = dexConnect;
 
     const getWelcomeMessage = async () => {
         const requestOptions = {
