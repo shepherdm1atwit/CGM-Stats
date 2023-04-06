@@ -29,10 +29,6 @@ async def get_user_by_email(email: str, db: Session):
     return db.query(models.User).filter(models.User.email == email).first()
 
 
-async def get_user_by_token(token: str, db: Session):
-    return db.query(models.User).filter(models.User.email == email).first()
-
-
 async def generate_email(db_user: models.User, topic: str, request: Request):
     token = randbytes(10)
     hashed_code = sha256()
@@ -216,3 +212,15 @@ async def get_current_user(
 
 def create_database():
     return database.Base.metadata.create_all(bind=database.engine)
+
+
+# Add user in database to avoid full account creation process during development/testing.
+# Email can be changed to a real email or mailtrap can be set as SMTP Provider to test.
+def create_test_user():
+    email = settings.TEST_USER_EMAIL
+    password = settings.TEST_USER_PASSWORD
+    if email != "" and password != "":
+        db = next(get_db())
+        user = models.User(email=email, name="TestUser", hashed_password=bcrypt.hash(password), verified_email=True)
+        db.add(user)
+        db.commit()

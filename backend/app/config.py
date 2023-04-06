@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     EMAIL_PASSWORD: str
     EMAIL_FROM: EmailStr
 
+    TEST_USER_EMAIL: str
+    TEST_USER_PASSWORD: str
+
     class Config:
         env_file = "app.config"
 

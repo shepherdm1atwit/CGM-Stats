@@ -1,13 +1,9 @@
-import React, {useContext, useState} from "react";
-import {UserContext} from "../context/UserContext";
+import React, {useState} from "react";
 import Register from "../components/Register";
 import Login from "../components/Login";
 import ForgotPassword from "../components/ForgotPassword";
 
 const UserManage = () => {
-    const {authToken, dexConnect} = useContext(UserContext);
-    const [token, ] = authToken;
-
     const [showRegister, setShowRegister] = useState(false);
     const [showLogin, setShowLogin] = useState(true);
     const [showForgotPassword, setShowForgotPassword] = useState(false);

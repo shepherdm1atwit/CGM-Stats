@@ -1,0 +1,28 @@
+# SMTP Provider/email information
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+EMAIL_FROM=
+
+# The base domain/subdomain this application will be hosted on, ex: cgmstats.example.com
+HOST_DOMAIN=
+
+# The URL of the desired Dexcom API:
+# https://sandbox-api.dexcom.com/ can be used for testing and https://api.dexcom.com/ for production
+DEXCOM_URL=
+
+# Client ID and secret, both generated once you create an app at developer.dexcom.com, found under /account/apps
+# DO NOT SHARE/DISCLOSE CLIENT SECRET, if compromised a new one can be generated at https://developer.dexcom.com/account/apps
+DEXCOM_CLIENT_ID=
+DEXCOM_CLIENT_SECRET=
+
+# Private key to use for generation of JWT Tokens, DO NOT SHARE OR DISCLOSE.
+JWT_PRIVATE_KEY=
+
+# TESTING VALUES BELOW FOR DEVELOPMENT/TROUBLESHOOTING ONLY. LEAVE BLANK FOR NO TEST USER
+# These will determine the email and password that will be created for the test user when the image is first created.
+# Set your email host to mailtrap or similar or set TEST_USER_EMAIL to a dev email to test email functionality.
+# Set password to desired CGM Stats test user password, this can be changed later through the forgot password utility
+TEST_USER_EMAIL=
+TEST_USER_PASSWORD=
