@@ -2,7 +2,8 @@ import React, {useContext, useEffect, useState} from "react";
 import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
 import UserManage from "../components/UserManage";
-import DisconnectDexcomButton from "../components/DisconnectDexcomButton";
+import Navbar from "../components/Navbar";
+import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -48,7 +49,7 @@ const AppMain = () => {
             <>
                 <Header title={message} />
                 <div className="columns is-centered is-mobile">
-                    <div className="column m-5 is-8 is-offset-2">
+                    <div className="column m-5 is-8 is-offset-2 has-text-centered">
                         <a href="https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=http://localhost:8080/VerifyDexcom/&response_type=code&scope=offline_access" className="button is-primary"> Connect to Dexcom </a>
                     </div>
                 </div>
@@ -58,11 +59,13 @@ const AppMain = () => {
     else {
         return (
             <>
-                <Header title={message} />
+                <Navbar />
+
                 <div className="columns is-centered is-mobile">
-                    <div className="column m-5 is-8 is-offset-2">
+                    <div className="column m-5 is-8 is-offset-2 has-text-centered">
                         <p>Important graphs and things go here</p>
-                        <DisconnectDexcomButton />
+                        <CurrentGlucoseLevel />
+
                     </div>
                 </div>
             </>
