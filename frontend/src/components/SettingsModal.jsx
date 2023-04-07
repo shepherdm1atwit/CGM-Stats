@@ -25,10 +25,14 @@ const SettingsModal = ({ onClose }) => {
   };
 
   const handleSubmit = () => {
+  if (highestGlucose < lowestGlucose) {
+    alert("Highest glucose value cannot be lower than lowest glucose value");
+  } else {
     // Here you can send the highestGlucose and lowestGlucose values to the backend
     console.log("Highest glucose value:", highestGlucose);
     console.log("Lowest glucose value:", lowestGlucose);
-  };
+  }
+};
 
   return (
     <div className={`modal ${isActive ? "is-active" : ""}`}>
