@@ -32,7 +32,6 @@ const AppMain = () => {
         getWelcomeMessage();
     }, []);
 
-    //TODO: FIX THE DEXCOM REDIRECT LINK, currently goes to localhost:8080, needs config
     if( token === null ){
         return (
             <>

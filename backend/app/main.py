@@ -4,7 +4,7 @@ from config import settings
 import services
 import schemas
 import requests
-import models
+from database import User as dbUser
 
 
 app = FastAPI()
@@ -69,7 +69,7 @@ async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode
         )
 
     try:
-        user = db.query(models.User).get(user.id)
+        user = db.query(dbUser).get(user.id)
         user.dex_access_token = data["access_token"]
         user.dex_refresh_token = data["refresh_token"]
         db.commit()
@@ -82,7 +82,7 @@ async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode
 
 @app.delete('/disconnectdexcom')
 async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
-    db_user = db.query(models.User).get(user.id)
+    db_user = db.query(dbUser).get(user.id)
     try:
         db_user.dex_access_token = None
         db_user.dex_refresh_token = None
@@ -94,7 +94,7 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
 
 @app.post('/savepreferences')
 async def save_preferences(preferences: schemas.UserPreferences, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
-    db_user = db.query(models.User).get(user.id)
+    db_user = db.query(dbUser).get(user.id)
     #TODO: not currently functional
     try:
         db_user.pref_gluc_min = preferences.minimum
@@ -107,7 +107,7 @@ async def save_preferences(preferences: schemas.UserPreferences, user: schemas.U
 
 @app.get('/getpreferences')
 async def get_preferences(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
-    db_user = db.query(models.User).get(user.id)
+    db_user = db.query(database.User).get(user.id)
     return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
 
 

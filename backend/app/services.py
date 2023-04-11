@@ -1,5 +1,5 @@
 import database
-import models
+from database import User as dbUser
 import schemas
 import jwt
 import requests
@@ -26,10 +26,10 @@ def get_db():
 
 
 async def get_user_by_email(email: str, db: Session):
-    return db.query(models.User).filter(models.User.email == email).first()
+    return db.query(dbUser).filter(dbUser.email == email).first()
 
 
-async def generate_email(db_user: models.User, topic: str, request: Request):
+async def generate_email(db_user: dbUser, topic: str, request: Request):
     token = randbytes(10)
     hashed_code = sha256()
     hashed_code.update(token)
@@ -50,7 +50,7 @@ async def generate_email(db_user: models.User, topic: str, request: Request):
 
 
 async def send_password_reset(email: str, request: Request, db: Session):
-    db_user = db.query(models.User).filter_by(email=email).filter(models.User.verified_email == True).first()
+    db_user = db.query(dbUser).filter_by(email=email).filter(dbUser.verified_email == True).first()
     if db_user is None:
         return {"status": "success"}
 
@@ -71,7 +71,7 @@ async def change_password(token: str, password: str, db: Session):
     hashed_code.update(bytes.fromhex(token))
     verification_code = hashed_code.hexdigest()
 
-    user = db.query(models.User).filter(models.User.verification_code == verification_code).first()
+    user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
 
     if not user:
         raise HTTPException(
@@ -84,13 +84,13 @@ async def change_password(token: str, password: str, db: Session):
 
 
 async def create_user(user: schemas.CreateUser, request: Request, db: Session):
-    user = models.User(
+    user = dbUser(
         email=user.email, name=user.name, hashed_password=bcrypt.hash(user.hashed_password)
     )
     db.add(user)
     db.commit()
 
-    db_user = db.query(models.User).filter_by(email=user.email).filter(models.User.verified_email == False).first()
+    db_user = db.query(dbUser).filter_by(email=user.email).filter(dbUser.verified_email == False).first()
 
     try:
         await generate_email(db_user=db_user, topic="verify_email", request=request)
@@ -111,7 +111,7 @@ async def verify_email(token: str, db: Session):
     hashed_code.update(bytes.fromhex(token))
     verification_code = hashed_code.hexdigest()
 
-    user = db.query(models.User).filter(models.User.verification_code == verification_code).first()
+    user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
 
     if not user:
         raise HTTPException(
@@ -138,7 +138,7 @@ async def authenticate_user(email: str, password: str, db: Session):
     return user
 
 
-async def create_token(user: models.User):
+async def create_token(user: dbUser):
     db_user = schemas.User.from_orm(user)
 
     token = jwt.encode(db_user.dict(), JWT_SECRET)
@@ -148,16 +148,13 @@ async def create_token(user: models.User):
 
 async def check_dexcom_connection(request: Request, user: schemas.User, db: Session):
     try:
-        db_user = db.query(models.User).get(user.id)
+        db_user = db.query(dbUser).get(user.id)
         url = settings.DEXCOM_URL + "v3/users/self/devices"
         headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
         response = requests.get(url, headers=headers)
         data = response.json()
         if "fault" in data:
-            try:
-                await refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
-            except:
-                return False
+            await refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
             db.refresh(db_user)
             headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
             response = requests.get(url, headers=headers)
@@ -171,7 +168,7 @@ async def check_dexcom_connection(request: Request, user: schemas.User, db: Sess
         raise HTTPException(status_code=500, detail="Problem checking dexcom connection.")
 
 
-async def refresh_dexcom_tokens(request: Request, db_user: models.User, db: Session):
+async def refresh_dexcom_tokens(request: Request, db_user: dbUser, db: Session):
     try:
         url = settings.DEXCOM_URL + "v2/oauth2/token"
         payload = {
@@ -201,17 +198,13 @@ async def get_current_user(
 ):
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        user = db.query(models.User).get(payload["id"])
+        user = db.query(dbUser).get(payload["id"])
     except:
         raise HTTPException(
             status_code=401, detail="Invalid Email or Password"
         )
 
     return schemas.User.from_orm(user)
-
-
-def create_database():
-    return database.Base.metadata.create_all(bind=database.engine)
 
 
 # Add user in database to avoid full account creation process during development/testing.
@@ -221,6 +214,6 @@ def create_test_user():
     password = settings.TEST_USER_PASSWORD
     if email != "" and password != "":
         db = next(get_db())
-        user = models.User(email=email, name="TestUser", hashed_password=bcrypt.hash(password), verified_email=True)
+        user = dbUser(email=email, name="TestUser", hashed_password=bcrypt.hash(password), verified_email=True)
         db.add(user)
         db.commit()

@@ -1,5 +1,6 @@
 fastapi
 sqlalchemy
+sqlalchemy_utils
 passlib[bcrypt]
 pydantic[dotenv]
 python-multipart
