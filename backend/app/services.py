@@ -146,7 +146,7 @@ async def create_token(user: models.User):
     return dict(access_token=token, token_type="bearer")
 
 
-async def check_dexcom_connection(user: schemas.User, db: Session):
+async def check_dexcom_connection(request: Request, user: schemas.User, db: Session):
     try:
         db_user = db.query(models.User).get(user.id)
         url = settings.DEXCOM_URL + "v3/users/self/devices"
@@ -155,7 +155,7 @@ async def check_dexcom_connection(user: schemas.User, db: Session):
         data = response.json()
         if "fault" in data:
             try:
-                await refresh_dexcom_tokens(db_user=db_user, db=db)
+                await refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
             except:
                 return False
             db.refresh(db_user)
@@ -171,13 +171,13 @@ async def check_dexcom_connection(user: schemas.User, db: Session):
         raise HTTPException(status_code=500, detail="Problem checking dexcom connection.")
 
 
-async def refresh_dexcom_tokens(db_user: models.User, db: Session):
+async def refresh_dexcom_tokens(request: Request, db_user: models.User, db: Session):
     try:
         url = settings.DEXCOM_URL + "v2/oauth2/token"
         payload = {
             "grant_type": "refresh_token",
             "refresh_token": db_user.dex_refresh_token,
-            "redirect_uri": "http://" + settings.HOST_DOMAIN,
+            "redirect_uri": f'{request.url.scheme}://{settings.HOST_DOMAIN}',
             "client_id": settings.DEXCOM_CLIENT_ID,
             "client_secret": settings.DEXCOM_CLIENT_SECRET
         }

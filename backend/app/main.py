@@ -41,19 +41,19 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
 
 
 @app.get("/dexconnected")
-async def check_user_dex_connection(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
-    return await services.check_dexcom_connection(user=user, db=db)
+async def check_user_dex_connection(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    return await services.check_dexcom_connection(request=request, user=user, db=db)
 
 
 @app.post("/authdexcom")
-async def authenticate_dexcom(authcode: schemas.DexcomAuthCode, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
     try:
         url = settings.DEXCOM_URL+"v2/oauth2/token"
 
         payload = {
             "grant_type": "authorization_code",
             "code": authcode.code,
-            "redirect_uri": "http://" + settings.HOST_DOMAIN,
+            "redirect_uri": f'{request.url.scheme}://{settings.HOST_DOMAIN}',
             "client_id": settings.DEXCOM_CLIENT_ID,
             "client_secret": settings.DEXCOM_CLIENT_SECRET
         }
@@ -88,11 +88,28 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
         db_user.dex_refresh_token = None
         db.commit()
     except:
-
-        raise HTTPException(
-            status_code=500, detail="Error removing dexcom tokens from database"
-        )
+        raise HTTPException(status_code=500, detail="Error removing dexcom tokens from database")
     return {"Status": "Dexcom account successfully disconnected."}
+
+
+@app.post('/savepreferences')
+async def save_preferences(preferences: schemas.UserPreferences, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    db_user = db.query(models.User).get(user.id)
+    #TODO: not currently functional
+    try:
+        db_user.pref_gluc_min = preferences.minimum
+        db_user.pref_gluc_max = preferences.maximum
+        db.commit()
+    except:
+        raise HTTPException(status_code=500, detail="Error updating preferences in database")
+    return preferences
+
+
+@app.get('/getpreferences')
+async def get_preferences(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    db_user = db.query(models.User).get(user.id)
+    return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
+
 
 @app.post('/verifyemail')
 async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):

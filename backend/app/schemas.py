@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from pydantic.fields import Optional
 
 
 class UserBase(BaseModel):
@@ -36,3 +37,8 @@ class ForgotPassEmail(BaseModel):
 class ResetPass(BaseModel):
     token: str
     password: str
+
+
+class UserPreferences(BaseModel):
+    minimum: Optional[int]
+    maximum: Optional[int]
