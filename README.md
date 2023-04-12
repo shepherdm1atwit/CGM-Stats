@@ -24,3 +24,4 @@ You will need your email's:
 **Note:** `TEST_USER_EMAIL` and `TEST_USER_PASSWORD` are for testing and debugging purposes, and will create a pre-verified test user to avoid needing to re-verify an email to test Dexcom connectivity. If either or both options are left blank, no test user is created.
 3. Run `./deploy.sh` from within the CGM-Stats folder to start the system. Once complete, the system will be running on port `8080`. From here, a reverse proxy can be used to expose the system to the internet or the system can be accessed via it's ip/port combination specified in the config file. If port `8080` is reserved or you would like to make the system directly available on port `80`, the frontend port can be changed by changint the frontend container's host port mapping in [docker-compose.yml](docker-compose.yml).
 
+MIT License: [LICENSE](LICENSE)
