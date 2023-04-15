@@ -40,5 +40,5 @@ class ResetPass(BaseModel):
 
 
 class UserPreferences(BaseModel):
-    minimum: Optional[int]
-    maximum: Optional[int]
+    minimum: Optional[int] = None
+    maximum: Optional[int] = None

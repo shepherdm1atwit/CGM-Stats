@@ -5,7 +5,7 @@ import services
 import schemas
 import requests
 from database import User as dbUser
-
+import datetime
 
 app = FastAPI()
 
@@ -13,6 +13,11 @@ app = FastAPI()
 @app.get("/api")
 async def root():
     return {"message": "CGM Stats"}
+
+
+#############################
+# CGM-Stats User Management #
+#############################
 
 
 @app.post("/register")
@@ -40,15 +45,59 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
 
 
+@app.post('/savepreferences')
+async def save_preferences(preferences: schemas.UserPreferences,
+                           user: schemas.User = Depends(services.get_current_user),
+                           db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    try:
+        db_user.pref_gluc_min = preferences.minimum
+        db_user.pref_gluc_max = preferences.maximum
+        db.commit()
+    except:
+        raise HTTPException(status_code=500, detail="Error updating preferences in database")
+    return {"Status": "Success"}
+
+
+# Potentially use this in UserContext?
+@app.get('/getpreferences')
+async def get_preferences(user: schemas.User = Depends(services.get_current_user),
+                          db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
+
+
+@app.post('/verifyemail')
+async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
+    return await services.verify_email(token=token.token, db=db)
+
+
+@app.post('/resetrequest')
+async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
+    return await services.send_password_reset(email=email.email, request=request, db=db)
+
+
+@app.post('/resetpassword')
+async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
+    return await services.change_password(token=msg.token, password=msg.password, db=db)
+
+
+##############################
+# Dexcom account managmement #
+##############################
+
 @app.get("/dexconnected")
-async def check_user_dex_connection(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def check_user_dex_connection(request: Request, user: schemas.User = Depends(services.get_current_user),
+                                    db: Session = Depends(services.get_db)):
     return await services.check_dexcom_connection(request=request, user=user, db=db)
 
 
 @app.post("/authdexcom")
-async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode,
+                              user: schemas.User = Depends(services.get_current_user),
+                              db: Session = Depends(services.get_db)):
     try:
-        url = settings.DEXCOM_URL+"v2/oauth2/token"
+        url = settings.DEXCOM_URL + "v2/oauth2/token"
 
         payload = {
             "grant_type": "authorization_code",
@@ -80,8 +129,10 @@ async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode
 
     return {"status": "success"}
 
+
 @app.delete('/disconnectdexcom')
-async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_user),
+                            db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     try:
         db_user.dex_access_token = None
@@ -92,35 +143,38 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
     return {"Status": "Dexcom account successfully disconnected."}
 
 
-@app.post('/savepreferences')
-async def save_preferences(preferences: schemas.UserPreferences, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+#############################
+# Graphing ETC for frontend #
+#############################
+
+
+@app.get('/getcurrentglucose')
+async def get_current_glucose(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
-    #TODO: not currently functional
-    try:
-        db_user.pref_gluc_min = preferences.minimum
-        db_user.pref_gluc_max = preferences.maximum
-        db.commit()
-    except:
-        raise HTTPException(status_code=500, detail="Error updating preferences in database")
-    return preferences
+    access_token = db_user.dex_access_token
+    end_time = datetime.datetime.now()
+    start_time = end_time - datetime.timedelta(hours=8)
 
+    url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
-@app.get('/getpreferences')
-async def get_preferences(user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
-    db_user = db.query(database.User).get(user.id)
-    return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
+    query = {
+        "startDate": start_time.isoformat(),
+        "endDate": end_time.isoformat()
+    }
 
+    headers = {"Authorization": f"Bearer {access_token}"}
 
-@app.post('/verifyemail')
-async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
-    return await services.verify_email(token=token.token, db=db)
+    response = requests.get(url, headers=headers, params=query)
+    data = response.json()
+    if "fault" in data:
+        await services.refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
+        db.refresh(db_user)
+        access_token = db_user.dex_access_token
+        headers["Authorization"] = f"Bearer {access_token}"
 
+        response = requests.get(url, headers=headers, params=query)
+        data = response.json()
 
-@app.post('/resetrequest')
-async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
-    return await services.send_password_reset(email=email.email, request=request, db=db)
-
-
-@app.post('/resetpassword')
-async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
-    return await services.change_password(token=msg.token, password=msg.password, db=db)
+    if len(data["records"]) == 0:
+        raise HTTPException(status_code=500, detail="no records found")
+    return {"value": data["records"][-1]["value"]}

@@ -8,7 +8,6 @@ from config import settings
 DATABASE_URL = "sqlite:///../db/database.db"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-print(f"\n\n\n\n\n   {DATABASE_URL}    \n\n\n\n")
 Base = declarative_base()
 
 

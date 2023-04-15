@@ -3,7 +3,7 @@ import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
 import UserManage from "../components/UserManage";
 import Navbar from "../components/Navbar";
-//import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel"; commented out to stop it from throwing erros on page load
+import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -66,7 +66,7 @@ const AppMain = () => {
 
                 <div className="columns is-centered is-mobile">
                     <div className="column m-5 is-8 is-offset-2 has-text-centered">
-                        <p>Important graphs and things go here</p>
+                        <CurrentGlucoseLevel />
                     </div>
                 </div>
             </>

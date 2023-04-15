@@ -182,11 +182,9 @@ async def refresh_dexcom_tokens(request: Request, db_user: dbUser, db: Session):
         response = requests.post(url, data=payload, headers=headers)
         data = response.json()
     except:
-        print("refresh_dexcom....")
         raise HTTPException(status_code=500, detail="Error refreshing tokens.")
     if "error" in data:
-        print("refresh_dexcom.... error in data")
-        raise HTTPException(status_code=500, detail="Error refreshing tokens.")
+        raise HTTPException(status_code=500, detail="Error refreshing tokens. - Error in data")
     db_user.dex_access_token = data["access_token"]
     db_user.dex_refresh_token = data["refresh_token"]
     db.commit()
