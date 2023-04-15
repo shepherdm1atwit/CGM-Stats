@@ -210,7 +210,7 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
     print(len(data["records"]))
 
     for record in data["records"]:
-
+        pass
 
     if len(data["records"]) == 0:
         raise HTTPException(status_code=500, detail="no records found")
