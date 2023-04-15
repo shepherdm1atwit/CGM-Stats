@@ -177,4 +177,42 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
 
     if len(data["records"]) == 0:
         raise HTTPException(status_code=500, detail="no records found")
-    return {"value": data["records"][-1]["value"]}
+    return {"value": data["records"][-1]["value"], "trend": data["records"][-1]["trend"]}
+
+
+@app.get('/getpastdayegvs')
+async def get_past_day_egvs(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    access_token = db_user.dex_access_token
+    end_time = datetime.datetime.now()
+    start_time = end_time - datetime.timedelta(hours=24)
+
+    url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
+
+    query = {
+        "startDate": start_time.isoformat(),
+        "endDate": end_time.isoformat()
+    }
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers, params=query)
+    data = response.json()
+    if "fault" in data:
+        await services.refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
+        db.refresh(db_user)
+        access_token = db_user.dex_access_token
+        headers["Authorization"] = f"Bearer {access_token}"
+
+        response = requests.get(url, headers=headers, params=query)
+        data = response.json()
+
+    print(len(data["records"]))
+
+    for record in data["records"]:
+
+
+    if len(data["records"]) == 0:
+        raise HTTPException(status_code=500, detail="no records found")
+
+    #return {"value": data["records"][-1]["value"]}
