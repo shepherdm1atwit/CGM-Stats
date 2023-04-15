@@ -12,31 +12,30 @@ const SettingsModal = ({ onClose }) => {
   const [minimumGlucose, setMinimumGlucose] = useState("");
   const [data, setData] = useState({ maximum: null, minimum: null });
 
-const getPreferences = async () => {
-  try {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+  useEffect(() => {
+    const getPreferences = async () => {
+      try {
+        const requestOptions = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await fetch("/api/getpreferences", requestOptions);
+        const data = await response.json();
+        console.log(data);
+        if (!response.ok) {
+          throw new Error("Error retrieving preferences from backend.");
+        }
+        setData({ maximum: data.maximum, minimum: data.minimum });
+      }
+      catch (error) {
+        setErrorMessage(error.message);
+      }
     };
-    const response = await fetch("/api/savepreferences", requestOptions);
-    const data = await response.json();
-    console.log(data);
-    if (!response.ok) {
-      throw new Error("Error retrieving preferences from backend.");
-    }
-    if (data.maximum && data.minimum) {
-      setData({ maximum: data.maximum, minimum: data.minimum });
-    } else {
-      setErrorMessage("Error: maximum and minimum values are not valid.");
-    }
-  } catch (error) {
-    setErrorMessage(error.message);
-  }
-};
-getPreferences();
+      getPreferences();
+  },[isActive]);
 
   const closeModal = () => {
     setIsActive(false);
@@ -72,7 +71,6 @@ getPreferences();
         };
         const response = await fetch("/api/savepreferences", requestOptions);
         const data = await response.json();
-        console.log(data);
         if (!response.ok) {
           throw new Error("Error sending preferences to backend.");
         }

@@ -45,6 +45,21 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
 
 
+@app.post('/verifyemail')
+async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
+    return await services.verify_email(token=token.token, db=db)
+
+
+@app.post('/resetrequest')
+async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
+    return await services.send_password_reset(email=email.email, request=request, db=db)
+
+
+@app.post('/resetpassword')
+async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
+    return await services.change_password(token=msg.token, password=msg.password, db=db)
+
+
 @app.post('/savepreferences')
 async def save_preferences(preferences: schemas.UserPreferences,
                            user: schemas.User = Depends(services.get_current_user),
@@ -65,21 +80,6 @@ async def get_preferences(user: schemas.User = Depends(services.get_current_user
                           db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
-
-
-@app.post('/verifyemail')
-async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
-    return await services.verify_email(token=token.token, db=db)
-
-
-@app.post('/resetrequest')
-async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
-    return await services.send_password_reset(email=email.email, request=request, db=db)
-
-
-@app.post('/resetpassword')
-async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
-    return await services.change_password(token=msg.token, password=msg.password, db=db)
 
 
 ##############################

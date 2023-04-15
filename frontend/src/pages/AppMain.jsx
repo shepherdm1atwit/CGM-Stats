@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import UserManage from "../components/UserManage";
 import Navbar from "../components/Navbar";
 import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
+import GraphModal from "../components/GraphModal";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -66,7 +67,7 @@ const AppMain = () => {
 
                 <div className="columns is-centered is-mobile">
                     <div className="column m-5 is-8 is-offset-2 has-text-centered">
-                        <CurrentGlucoseLevel />
+                        <GraphModal />
                     </div>
                 </div>
             </>
