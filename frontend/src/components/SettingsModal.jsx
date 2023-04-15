@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
-import DisconnectDexcomButton from "./DisconnectDexcomButton";
 import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
+import DisconnectDexcomButton from "./DisconnectDexcomButton";
 
 const SettingsModal = ({ onClose }) => {
   const [isActive, setIsActive] = useState(true);
@@ -16,7 +16,7 @@ const SettingsModal = ({ onClose }) => {
     onClose();
   };
 
-  const handleChange = async (event) => {
+  const handleChange = (event) => {
     const { name, value } = event.target;
     if (name === "maximumGlucose") {
       setMaximumGlucose(value);
@@ -24,37 +24,35 @@ const SettingsModal = ({ onClose }) => {
       setMinimumGlucose(value);
     }
   };
-    //Function currently doesn't work
+
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log("Max"+maximumGlucose)
-    console.log("Min"+minimumGlucose)
-    if (maximumGlucose <= minimumGlucose) {
-      console.log("Max"+maximumGlucose)
-    console.log("Min"+minimumGlucose)
-      setErrorMessage("Maximum glucose value must be higher than minimum glucose value");
-    } else {
+  event.preventDefault();
+  const maxGlucose = parseInt(maximumGlucose, 10);
+  const minGlucose = parseInt(minimumGlucose, 10);
+  if (maxGlucose <= minGlucose) {
+    setErrorMessage("Maximum glucose value must be higher than minimum glucose value");
+  } else {
+    try {
       const requestOptions = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ minimum: minimumGlucose, maximum: maximumGlucose }),
+        body: JSON.stringify({ minimum: minGlucose, maximum: maxGlucose }),
       };
       const response = await fetch("/api/savepreferences", requestOptions);
+      const data = await response.json();
+      console.log(data);
       if (!response.ok) {
-        setErrorMessage("Error sending preferences to backend.");
-      } else {
-        setErrorMessage("");
+        throw new Error("Error sending preferences to backend.");
       }
+      closeModal();
+    } catch (error) {
+      setErrorMessage(error.message);
     }
-  };
-  const test = () => {
-    console.log("Max"+maximumGlucose)
-    console.log("Min"+minimumGlucose)
-    console.log("Max > Min"+maximumGlucose > minimumGlucose )
   }
+};
 
   return (
     <div className={`modal ${isActive ? "is-active" : ""}`}>
@@ -95,15 +93,12 @@ const SettingsModal = ({ onClose }) => {
             <ErrorMessage message={errorMessage} color="red" />
             <footer className="modal-card-foot">
               <button className="button is-primary" type="submit">
-                Save changes
+                Save
               </button>
               <button className="button" onClick={closeModal}>
                 Cancel
-              </button>
+                </button>
               <DisconnectDexcomButton class="is-justify-content-right" />
-              <button onClick={test}>
-                Test
-              </button>
             </footer>
           </section>
         </form>
