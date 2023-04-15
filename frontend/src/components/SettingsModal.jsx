@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 import DisconnectDexcomButton from "./DisconnectDexcomButton";
@@ -10,6 +10,33 @@ const SettingsModal = ({ onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [maximumGlucose, setMaximumGlucose] = useState("");
   const [minimumGlucose, setMinimumGlucose] = useState("");
+  const [data, setData] = useState({ maximum: null, minimum: null });
+
+const getPreferences = async () => {
+  try {
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const response = await fetch("/api/savepreferences", requestOptions);
+    const data = await response.json();
+    console.log(data);
+    if (!response.ok) {
+      throw new Error("Error retrieving preferences from backend.");
+    }
+    if (data.maximum && data.minimum) {
+      setData({ maximum: data.maximum, minimum: data.minimum });
+    } else {
+      setErrorMessage("Error: maximum and minimum values are not valid.");
+    }
+  } catch (error) {
+    setErrorMessage(error.message);
+  }
+};
+getPreferences();
 
   const closeModal = () => {
     setIsActive(false);
@@ -26,33 +53,35 @@ const SettingsModal = ({ onClose }) => {
   };
 
   const handleSubmit = async (event) => {
-  event.preventDefault();
-  const maxGlucose = parseInt(maximumGlucose, 10);
-  const minGlucose = parseInt(minimumGlucose, 10);
-  if (maxGlucose <= minGlucose) {
-    setErrorMessage("Maximum glucose value must be higher than minimum glucose value");
-  } else {
-    try {
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ minimum: minGlucose, maximum: maxGlucose }),
-      };
-      const response = await fetch("/api/savepreferences", requestOptions);
-      const data = await response.json();
-      console.log(data);
-      if (!response.ok) {
-        throw new Error("Error sending preferences to backend.");
+    event.preventDefault();
+    const maxGlucose = parseInt(maximumGlucose, 10);
+    const minGlucose = parseInt(minimumGlucose, 10);
+    if (maxGlucose <= minGlucose) {
+      setErrorMessage("Maximum glucose value must be higher than minimum glucose value");
+    } else if (maxGlucose === 0 || minGlucose === 0) {
+      setErrorMessage("Maximum and minimum glucose values must be greater than 0");
+    } else {
+      try {
+        const requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ minimum: minGlucose, maximum: maxGlucose }),
+        };
+        const response = await fetch("/api/savepreferences", requestOptions);
+        const data = await response.json();
+        console.log(data);
+        if (!response.ok) {
+          throw new Error("Error sending preferences to backend.");
+        }
+        closeModal();
+      } catch (error) {
+        setErrorMessage(error.message);
       }
-      closeModal();
-    } catch (error) {
-      setErrorMessage(error.message);
     }
-  }
-};
+  };
 
   return (
     <div className={`modal ${isActive ? "is-active" : ""}`}>
@@ -65,8 +94,9 @@ const SettingsModal = ({ onClose }) => {
         <form onSubmit={handleSubmit}>
           <section className="modal-card-body">
             <div className="field">
-              <label className="label">Maximum Preferred Blood Glucose (mg/dL)</label>
+              <label className="label">{`Current Maximum: ${data.maximum || "-"}`}</label>
               <div className="control">
+                <span className="has-text-grey">Enter your maximum preferred blood glucose (mg/dL)</span>
                 <input
                   type="number"
                   name="maximumGlucose"
@@ -78,8 +108,9 @@ const SettingsModal = ({ onClose }) => {
               </div>
             </div>
             <div className="field">
-              <label className="label">Minimum Preferred Blood Glucose (mg/dL)</label>
+              <label className="label">{`Current Minimum: ${data.minimum || "-"}`}</label>
               <div className="control">
+                <span className="has-text-grey">Enter your minimum preferred blood glucose (mg/dL)</span>
                 <input
                   type="number"
                   name="minimumGlucose"
