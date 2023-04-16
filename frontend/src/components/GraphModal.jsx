@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Modal } from 'react-bulma-components';
 import CurrentGlucoseLevel from "./CurrentGlucoseLevel";
 import PastDayGraph from "./PastDayGraph";
+import BestDay from "./BestDay";
 
 const graphs = [
     <CurrentGlucoseLevel />,
-    <PastDayGraph />
+    <PastDayGraph />,
+    <BestDay />
 ];
 
 const GraphModal = () => {

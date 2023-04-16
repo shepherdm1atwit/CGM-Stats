@@ -6,6 +6,7 @@ import schemas
 import requests
 from database import User as dbUser
 import datetime
+from statistics import pstdev
 
 app = FastAPI()
 
@@ -235,3 +236,80 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
 
     xy_pairs.reverse()
     return {"xy_pairs": xy_pairs}
+
+
+# add ability to select timeframe/month?
+@app.get('/getbestday')
+async def get_best_day(request: Request, user: schemas.User = Depends(services.get_current_user),
+                       db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    access_token = db_user.dex_access_token
+    end_time = datetime.datetime.now()
+    start_time = end_time - datetime.timedelta(days=30)
+
+    url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
+
+    query = {
+        "startDate": start_time.isoformat(),
+        "endDate": end_time.isoformat()
+    }
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers, params=query)
+    data = response.json()
+    if "fault" in data:
+        await services.refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
+        db.refresh(db_user)
+        access_token = db_user.dex_access_token
+        headers["Authorization"] = f"Bearer {access_token}"
+
+        response = requests.get(url, headers=headers, params=query)
+        data = response.json()
+
+    records = data["records"]
+
+    if len(records) == 0:
+        raise HTTPException(status_code=500, detail="no records found")
+
+    date_time = datetime.datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    date_vals = []
+
+    lowest_std = None
+    best_day = None
+
+    for num_record, record in enumerate(records):
+        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        if record_date_time.date() == date_time.date():
+            date_vals.append(record["value"])
+        else:
+            date_std = pstdev(date_vals)
+            if lowest_std is None or date_std < lowest_std:
+                lowest_std = date_std
+                best_day = date_time
+            date_time = record_date_time
+            date_vals = [record["value"]]
+
+    xy_pairs = []
+
+    best_day_date_time = None
+    egv_sum = 0
+    egv_count = 0
+
+    for num_record, record in enumerate(records):
+        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        if record_date_time.date() == best_day.date():
+            if best_day_date_time is None:
+                best_day_date_time = record_date_time
+            if record_date_time.hour == best_day_date_time.hour:
+                egv_sum += record["value"]
+                egv_count += 1
+            else:
+                xy_pairs.append({"x": best_day_date_time.isoformat() + ".000Z", "y": round(egv_sum / egv_count)})
+                best_day_date_time = record_date_time
+                egv_sum = record["value"]
+                egv_count = 1
+
+    xy_pairs.reverse()
+
+    return {"best_day": best_day.isoformat(), "best_day_std": lowest_std, "xy_pairs": xy_pairs}
