@@ -81,26 +81,28 @@ const CurrentGlucoseLevel = () => {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
       <div style={{ marginBottom: "0.5rem", fontSize: "0.8rem", fontWeight: "bold" }}>Current Glucose Level</div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          width: "100px",
-          height: "100px",
-          borderRadius: "50%",
-          backgroundColor: "#4caf50",
-          color: "white",
-          fontWeight: "bold",
-          fontSize: "2rem",
-          marginRight: "1rem",
-        }}
-      >
-        <div>{currentGlucose}</div>
-        <div style={{ fontSize: "0.6rem" }}>mg/dl</div>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            backgroundColor: "#4caf50",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "2rem",
+            marginRight: "1rem",
+          }}
+        >
+          <div>{currentGlucose}</div>
+          <div style={{ fontSize: "0.6rem" }}>mg/dl</div>
+        </div>
+        {arrowIcon && <span style={{ color: arrowColor }}>{arrowIcon}</span>}
       </div>
-      {arrowIcon && <span style={{ color: arrowColor }}>{arrowIcon}</span>}
     </div>
   );
 };
