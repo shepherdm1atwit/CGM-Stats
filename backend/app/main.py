@@ -177,7 +177,9 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
 
     if len(data["records"]) == 0:
         raise HTTPException(status_code=500, detail="no records found")
-    return {"value": data["records"][-1]["value"], "trend": data["records"][-1]["trend"]}
+    record = data["records"][0]
+    date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    return {"value": record["value"], "trend": record["trend"], "timestamp": date_time.isoformat()+".000Z"}
 
 
 @app.get('/getpastdayegvs')
@@ -207,16 +209,27 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
         response = requests.get(url, headers=headers, params=query)
         data = response.json()
 
-    print(len(data["records"]))
+    records = data["records"]
 
-    times = []
-    values = []
-
-    for num_record, record in enumerate(data["records"]):
-        times.append(datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ').isoformat())
-        values.append(record["value"])
-
-    if len(data["records"]) == 0:
+    if len(records) == 0:
         raise HTTPException(status_code=500, detail="no records found")
 
-    return {"times": times, "values": values}
+
+    xy_pairs = []
+
+    date_time = datetime.datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    egv_sum = 0
+    egv_count = 0
+
+    for num_record, record in enumerate(records):
+        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        if record_date_time.hour == date_time.hour:
+            egv_sum += record["value"]
+            egv_count += 1
+        else:
+            xy_pairs.append({"x": date_time.isoformat()+".000Z", "y": round(egv_sum/egv_count)})
+            date_time = record_date_time
+            egv_sum = record["value"]
+            egv_count = 1
+
+    return {"graphData": xy_pairs}

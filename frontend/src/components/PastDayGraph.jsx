@@ -5,8 +5,7 @@ import {Chart} from "react-chartjs-2";
 const PastDayGraph = () => {
   const {authToken,} = useContext(UserContext);
   const [token,] = authToken;
-  const [EGVs, setEGVs] = useState([])
-  const [times, setTimes] = useState([])
+  const [graphData, setGraphData] = useState([])
 
   useEffect(() => {
     const getPastDayGlucose = async () => {
@@ -23,8 +22,8 @@ const PastDayGraph = () => {
         console.log(data.detail)
       }
       else {
-        setEGVs(data.values)
-        setTimes(data.times)
+        setGraphData(data.graphData)
+        console.log(graphData)
       }
     }
     getPastDayGlucose()
