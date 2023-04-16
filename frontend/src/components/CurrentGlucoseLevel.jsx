@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowUp, faArrowDown, faLongArrowAltUp, faLongArrowAltDown, faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import ErrorMessage from "./ErrorMessage";
+import { ArrowDownRight, ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from 'react-feather';
 
 const CurrentGlucoseLevel = () => {
   const { authToken } = useContext(UserContext);
@@ -40,48 +38,49 @@ const CurrentGlucoseLevel = () => {
 
   switch (currentTrend) {
     case "doubleUp":
-      arrowIcon = faLongArrowAltUp;
+      arrowIcon = <ArrowUpRight size="32" strokeWidth="1" />;
       arrowColor = "red";
       break;
     case "singleUp":
-      arrowIcon = faArrowUp;
+      arrowIcon = <ArrowUp size="32" strokeWidth="1" />;
       arrowColor = "orange";
       break;
     case "fortyFiveUp":
-      arrowIcon = faArrowUp;
-      arrowColor = "yellow";
+      arrowIcon = <ArrowUpRight size="32" strokeWidth="1" />;
+      arrowColor = "#FFD700";
       break;
     case "flat":
-      arrowIcon = faArrowRight;
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
       arrowColor = "lightgreen";
       break;
     case "fortyFiveDown":
-      arrowIcon = faArrowDown;
-      arrowColor = "yellow";
+      arrowIcon = <ArrowDownRight size="32" strokeWidth="1" />;
+      arrowColor = "#FFD700";
       break;
     case "singleDown":
-      arrowIcon = faArrowDown;
+      arrowIcon = <ArrowDown size="32" strokeWidth="1" />;
       arrowColor = "orange";
       break;
     case "doubleDown":
-      arrowIcon = faLongArrowAltDown;
+      arrowIcon = <ArrowDownRight size="32" strokeWidth="1" />;
       arrowColor = "red";
       break;
     case "notComputable":
-      arrowIcon = faArrowRight;
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
       arrowColor = "grey";
       break;
     case "rateOutOfRange":
-      arrowIcon = faArrowRight;
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
       arrowColor = "grey";
       break;
     default:
-      arrowIcon = faArrowRight;
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
       arrowColor = "grey";
   }
 
-    return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ marginBottom: "0.5rem", fontSize: "0.8rem", fontWeight: "bold" }}>Current Glucose Level</div>
       <div
         style={{
           display: "flex",
@@ -101,13 +100,7 @@ const CurrentGlucoseLevel = () => {
         <div>{currentGlucose}</div>
         <div style={{ fontSize: "0.6rem" }}>mg/dl</div>
       </div>
-      {arrowIcon && (
-        <FontAwesomeIcon
-          icon={arrowIcon}
-          color={arrowColor}
-          size="2x"
-        />
-      )}
+      {arrowIcon && <span style={{ color: arrowColor }}>{arrowIcon}</span>}
     </div>
   );
 };
