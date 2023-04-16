@@ -232,6 +232,6 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
             date_time = record_date_time
             egv_sum = record["value"]
             egv_count = 1
-    print(xy_pairs)
 
+    xy_pairs.reverse()
     return {"xy_pairs": xy_pairs}
