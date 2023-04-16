@@ -92,7 +92,7 @@ const SettingsModal = ({ onClose }) => {
         <form onSubmit={handleSubmit}>
           <section className="modal-card-body">
             <div className="field">
-              <label className="label">{`Current Maximum: ${data.maximum || "-"}`}</label>
+              <label className="label">{`Current Maximum: ${data.maximum || "-"} (mg/dL)`}</label>
               <div className="control">
                 <span className="has-text-grey">Enter your maximum preferred blood glucose (mg/dL)</span>
                 <input
@@ -106,7 +106,7 @@ const SettingsModal = ({ onClose }) => {
               </div>
             </div>
             <div className="field">
-              <label className="label">{`Current Minimum: ${data.minimum || "-"}`}</label>
+              <label className="label">{`Current Minimum: ${data.minimum || "-"} (mg/dL)`}</label>
               <div className="control">
                 <span className="has-text-grey">Enter your minimum preferred blood glucose (mg/dL)</span>
                 <input
