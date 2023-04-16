@@ -80,11 +80,12 @@ const CurrentGlucoseLevel = () => {
       arrowColor = "grey";
   }
 
-  return (
+    return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           width: "100px",
@@ -97,7 +98,8 @@ const CurrentGlucoseLevel = () => {
           marginRight: "1rem",
         }}
       >
-        {currentGlucose}
+        <div>{currentGlucose}</div>
+        <div style={{ fontSize: "0.6rem" }}>mg/dl</div>
       </div>
       {arrowIcon && (
         <FontAwesomeIcon
