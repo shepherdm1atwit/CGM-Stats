@@ -29,10 +29,12 @@ const PastDayGraph = () => {
   }, [token]);
 
  const formatTick = (x) => {
-    const hour = new Date(x).getHours();
-    if (hour > 12) {
-      return hour - 12 + "pm";
-    } else {
+     const hour = new Date(x).getHours();
+     if (hour > 12) {
+         return hour - 12 + "pm";
+     } else if (hour == 0) {
+         return hour + 12 + "am";
+     } else {
       return hour + "am";
     }
   };
@@ -55,7 +57,7 @@ const PastDayGraph = () => {
         />
         <VictoryAxis
           tickFormat={(x) => formatTick(x)}
-          style={{ tickLabels: { fontSize: 3 } }}
+          style={{ tickLabels: { fontSize: 4 } }}
         />
         <VictoryAxis dependentAxis />
       </VictoryChart>
