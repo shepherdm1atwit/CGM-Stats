@@ -209,10 +209,14 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
 
     print(len(data["records"]))
 
-    for record in data["records"]:
-        pass
+    times = []
+    values = []
+
+    for num_record, record in enumerate(data["records"]):
+        times.append(datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ').isoformat())
+        values.append(record["value"])
 
     if len(data["records"]) == 0:
         raise HTTPException(status_code=500, detail="no records found")
 
-    #return {"value": data["records"][-1]["value"]}
+    return {"times": times, "values": values}

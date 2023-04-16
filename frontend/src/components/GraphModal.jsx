@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bulma-components';
-import Login from "./Login";
-import Register from "./Register";
-import ForgotPassword from "./ForgotPassword";
+import CurrentGlucoseLevel from "./CurrentGlucoseLevel";
+import PastDayGraph from "./PastDayGraph";
 
 const graphs = [
-  <Login />,
-  <Register/>,
-  <ForgotPassword />
+    <CurrentGlucoseLevel />,
+    <PastDayGraph />
 ];
 
 const GraphModal = () => {
