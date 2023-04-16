@@ -57,7 +57,7 @@ const PastDayGraph = () => {
         />
         <VictoryAxis
           tickFormat={(x) => formatTick(x)}
-          style={{ tickLabels: { fontSize: 4 } }}
+          style={{ tickLabels: { fontSize: 6 , angle: 60} }}
         />
         <VictoryAxis dependentAxis />
       </VictoryChart>
