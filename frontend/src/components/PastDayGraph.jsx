@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis } from "victory";
+import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryLabel } from "victory";
 
 const PastDayGraph = () => {
   const { authToken } = useContext(UserContext);
@@ -28,9 +28,24 @@ const PastDayGraph = () => {
     getPastDayGlucose();
   }, [token]);
 
+ const formatTick = (x) => {
+    const hour = new Date(x).getHours();
+    if (hour > 12) {
+      return hour - 12 + "pm";
+    } else {
+      return hour + "am";
+    }
+  };
+
   return (
     <div className="box">
       <VictoryChart theme={VictoryTheme.material} width={300} height={200}>
+          <VictoryLabel
+              x={150}
+              y={20}
+              text="Past Day"
+              textAnchor="middle"
+              />
         <VictoryLine
           style={{
             data: { stroke: "#c43a31" },
@@ -39,8 +54,8 @@ const PastDayGraph = () => {
           data={graphData}
         />
         <VictoryAxis
-          tickFormat={(x) => new Date(x).getHours() + "h"}
-          style={{ tickLabels: { fontSize: 5 } }}
+          tickFormat={(x) => formatTick(x)}
+          style={{ tickLabels: { fontSize: 3 } }}
         />
         <VictoryAxis dependentAxis />
       </VictoryChart>
