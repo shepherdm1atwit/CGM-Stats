@@ -149,7 +149,8 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
 
 
 @app.get('/getcurrentglucose')
-async def get_current_glucose(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def get_current_glucose(request: Request, user: schemas.User = Depends(services.get_current_user),
+                              db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.datetime.now()
@@ -179,11 +180,12 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
         raise HTTPException(status_code=500, detail="no records found")
     record = data["records"][0]
     date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
-    return {"value": record["value"], "trend": record["trend"], "timestamp": date_time.isoformat()+".000Z"}
+    return {"value": record["value"], "trend": record["trend"], "timestamp": date_time.isoformat() + ".000Z"}
 
 
 @app.get('/getpastdayegvs')
-async def get_past_day_egvs(request: Request, user: schemas.User = Depends(services.get_current_user), db: Session = Depends(services.get_db)):
+async def get_past_day_egvs(request: Request, user: schemas.User = Depends(services.get_current_user),
+                            db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.datetime.now()
@@ -214,7 +216,6 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
     if len(records) == 0:
         raise HTTPException(status_code=500, detail="no records found")
 
-
     xy_pairs = []
 
     date_time = datetime.datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
@@ -227,9 +228,10 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
             egv_sum += record["value"]
             egv_count += 1
         else:
-            xy_pairs.append({"x": date_time.isoformat()+".000Z", "y": round(egv_sum/egv_count)})
+            xy_pairs.append({"x": date_time.isoformat() + ".000Z", "y": round(egv_sum / egv_count)})
             date_time = record_date_time
             egv_sum = record["value"]
             egv_count = 1
+    print(xy_pairs)
 
-    return {"graphData": xy_pairs}
+    return {"xy_pairs": xy_pairs}

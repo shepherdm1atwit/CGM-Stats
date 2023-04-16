@@ -1,11 +1,12 @@
 import React, {useContext, useEffect, useState} from "react";
 import { UserContext } from "../context/UserContext";
-import {Chart} from "react-chartjs-2";
+import {VictoryChart, VictoryLine, VictoryTheme} from "victory";
 
 const PastDayGraph = () => {
   const {authToken,} = useContext(UserContext);
   const [token,] = authToken;
   const [graphData, setGraphData] = useState([])
+
 
   useEffect(() => {
     const getPastDayGlucose = async () => {
@@ -22,8 +23,11 @@ const PastDayGraph = () => {
         console.log(data.detail)
       }
       else {
-        setGraphData(data.graphData)
+        setGraphData(data.xy_pairs)
+        //TODO: why is VVVVthisVVVV not printing graphdata????
+
         console.log(graphData)
+
       }
     }
     getPastDayGlucose()
@@ -33,7 +37,11 @@ const PastDayGraph = () => {
 
   return (
     <>
-      <h1>THIS IS NOT DONE, NEEDS FINISHING</h1>
+      <VictoryChart theme={VictoryTheme.material}>
+        <VictoryLine
+            style={{data: { stroke: "#c43a31" }, parent: { border: "1px solid #ccc"}}}
+            data={graphData}/>
+      </VictoryChart>
     </>
   );
 }
