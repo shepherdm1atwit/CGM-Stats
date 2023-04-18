@@ -22,8 +22,8 @@ const CurrentGlucoseLevel = () => {
       if (!response.ok) {
         console.log(data.detail);
       } else {
-        console.log(data.value);
-        console.log(data);
+        //console.log(data.value);
+        //console.log(data);
         const currentGlucoseValue = data.value;
         setCurrentGlucose(currentGlucoseValue);
         const currentTrendValue = data.trend;
