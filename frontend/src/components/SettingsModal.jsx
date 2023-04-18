@@ -37,9 +37,29 @@ const SettingsModal = ({ onClose }) => {
       getPreferences();
   },[isActive]);
 
+  const deletePreferences = async () => {
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    };
+    const response = await fetch("/api/deletepreferences", requestOptions);
+    const data = await response.json();
+    if( !response.ok ){
+      setErrorMessage(data.detail)
+    }
+    else{
+      setErrorMessage("")
+      closeModal()
+    }
+  };
+
   const closeModal = () => {
     setIsActive(false);
     onClose();
+    window.location.reload()
   };
 
   const handleChange = (event) => {
@@ -124,9 +144,12 @@ const SettingsModal = ({ onClose }) => {
               <button className="button is-primary" type="submit">
                 Save
               </button>
+              <button className="button" onClick={deletePreferences}>
+                Clear Preferences
+              </button>
               <button className="button" onClick={closeModal}>
                 Cancel
-                </button>
+              </button>
               <DisconnectDexcomButton class="is-justify-content-right" />
             </footer>
           </section>

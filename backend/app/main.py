@@ -83,6 +83,19 @@ async def get_preferences(user: schemas.User = Depends(services.get_current_user
     return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
 
 
+@app.delete('/deletepreferences')
+async def delete_preferences(user: schemas.User = Depends(services.get_current_user),
+                             db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    try:
+        db_user.pref_gluc_max = None
+        db_user.pref_gluc_min = None
+        db.commit()
+    except:
+        raise HTTPException(status_code=500, detail="Error removing preferences from database")
+    return {"Status": "Preferences successfully cleared."}
+
+
 ##############################
 # Dexcom account managmement #
 ##############################
