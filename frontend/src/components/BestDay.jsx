@@ -11,7 +11,7 @@ const BestDay = () => {
   const [, setErrorMessage] = useState("");
   const [data, setData] = useState({ maximum: null, minimum: null });
 
-      useEffect(() => {
+  useEffect(() => {
     const getPreferences = async () => {
       try {
         const requestOptions = {

@@ -244,7 +244,7 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
                        db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now()
+    end_time = datetime.datetime.now() - datetime.timedelta(days=1)
     start_time = end_time - datetime.timedelta(days=30)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
@@ -301,7 +301,9 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
         if record_date_time.date() == best_day.date():
             if best_day_date_time is None:
                 best_day_date_time = record_date_time
-            if record_date_time.hour == best_day_date_time.hour:
+                egv_sum += record["value"]
+                egv_count += 1
+            elif record_date_time.hour == best_day_date_time.hour:
                 egv_sum += record["value"]
                 egv_count += 1
             else:
@@ -311,5 +313,4 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
                 egv_count = 1
 
     xy_pairs.reverse()
-
     return {"best_day": best_day.isoformat(), "best_day_std": lowest_std, "xy_pairs": xy_pairs}
