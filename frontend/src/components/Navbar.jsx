@@ -22,14 +22,14 @@ const Navbar = () => {
           CGM Stats
         </a>
 
-        <a role="button" className="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <a role="button" className="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navBar">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </a>
       </div>
 
-      <div id="navbarBasicExample" className="navbar-menu">
+      <div id="navBar" className="navbar-menu">
         <div className="navbar-start">
           <a className="navbar-item" onClick={handleOpenSettingsModal}>
             Settings
