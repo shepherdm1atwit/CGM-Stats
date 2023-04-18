@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     EMAIL_USERNAME: str
     EMAIL_PASSWORD: str
     EMAIL_FROM: EmailStr
+    USE_TLS: bool
 
     TEST_USER_EMAIL: str
     TEST_USER_PASSWORD: str

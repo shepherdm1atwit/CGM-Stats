@@ -17,7 +17,7 @@ class EmailSchema(BaseModel):
 class Email:
     def __init__(self, user: dict, url: str, email: List[EmailStr]):
         self.name = user['name']
-        self.sender = 'CGM Stats <admin@admin.com>'  # TODO: change this address to a real email
+        self.sender = 'CGM Stats <mailbot1248@gmail.com>'  # TODO: change this address to a real email
         self.email = email
         self.url = url
         pass
@@ -30,7 +30,7 @@ class Email:
             MAIL_FROM=settings.EMAIL_FROM,
             MAIL_PORT=settings.EMAIL_PORT,
             MAIL_SERVER=settings.EMAIL_HOST,
-            MAIL_STARTTLS=False,
+            MAIL_STARTTLS=settings.USE_TLS,
             MAIL_SSL_TLS=False,
             USE_CREDENTIALS=True,
             VALIDATE_CERTS=True
