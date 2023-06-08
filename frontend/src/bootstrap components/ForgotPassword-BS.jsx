@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import ErrorMessage from "../components/ErrorMessage";
+import Button from "react-bootstrap/Button";
 
-const ForgotPassword = () => {
+const ForgotPasswordBS = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -56,12 +57,14 @@ const ForgotPassword = () => {
           <div className="notification is-primary">{successMessage}</div>
         )}
         <br />
-        <button className="button is-primary" type="submit">
+
+        <Button variant="danger" type="submit">
           Send Reset Link
-        </button>
+        </Button>{' '}
+
       </form>
     </div>
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordBS;
