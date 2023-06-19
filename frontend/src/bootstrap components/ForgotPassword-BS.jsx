@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import ErrorMessage from "../components/ErrorMessage";
 import Button from "react-bootstrap/Button";
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Form from 'react-bootstrap/Form';
+
 
 const ForgotPasswordBS = () => {
   const [email, setEmail] = useState("");
@@ -35,35 +38,29 @@ const ForgotPasswordBS = () => {
 
   return (
      <div className="column">
-      <form className="box" onSubmit={handleSubmit}>
-        <h1 className="title has-text-centered">Forgot Password</h1>
-        <div className="field">
-          <label className="label">Email Address</label>
-          <div className="control">
-            <input
-              type="email"
-              placeholder="Enter email"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
 
-        </div>
-       <ErrorMessage message={errorMessage} color="red" />
-        {successMessage && (
-          <div className="notification is-primary">{successMessage}</div>
-        )}
-        <br />
+       <Form onSubmit={handleSubmit}>
 
-        <Button variant="danger" type="submit">
+        <FloatingLabel
+            className="mb-3"
+            controlId="floatingTextArea"
+            label="Enter your email here"
+        >
+          <Form.Control
+                type="email"
+                autoComplete="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input"
+                required />
+        </FloatingLabel>
+
+        <Button variant="primary" type="submit">
           Send Reset Link
         </Button>{' '}
+      </Form>
+      </div>
 
-      </form>
-    </div>
   );
 };
 
