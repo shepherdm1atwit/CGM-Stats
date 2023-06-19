@@ -4,7 +4,6 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyDexcom from "./pages/VerifyDexcom";
 
-
 function App(){
     return(
         <>
