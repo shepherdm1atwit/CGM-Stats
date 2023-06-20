@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
-import UserManage from "../components/UserManage";
+import UserManage from "../bootstrap components/UserManage-BS";
 import Navbar from "../components/Navbar";
 import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
 import GraphModal from "../components/GraphModal";

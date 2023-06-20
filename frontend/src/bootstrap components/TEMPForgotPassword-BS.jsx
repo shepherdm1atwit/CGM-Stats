@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import ErrorMessage from "../components/ErrorMessage";
-import Button from "react-bootstrap/Button";
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import ErrorMessage from "./ErrorMessage-BS";
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Alert from 'react-bootstrap/Alert';
+import Card from 'react-bootstrap/Card';
+import Container from 'react-bootstrap/Container';
 
-
-const ForgotPasswordBS = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -37,31 +38,31 @@ const ForgotPasswordBS = () => {
 
 
   return (
-     <div className="column">
+    <Container className="d-flex justify-content-center">
 
-       <Form onSubmit={handleSubmit}>
-
-        <FloatingLabel
-            className="mb-3"
-            controlId="floatingTextArea"
-            label="Enter your email here"
-        >
-          <Form.Control
+          <Form onSubmit={handleSubmit}>
+            <h1 className="h3 mb-3 text-center">Forgot Password</h1>
+            <Form.Group className="mb-3">
+              <Form.Label>Email Address</Form.Label>
+              <Form.Control
                 type="email"
+                placeholder="Enter email"
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                required />
-        </FloatingLabel>
-
-        <Button variant="primary" type="submit">
-          Send Reset Link
-        </Button>{' '}
-      </Form>
-      </div>
-
+                required
+              />
+            </Form.Group>
+            <ErrorMessage message={errorMessage} color="red" />
+            {successMessage && (
+              <Alert variant="primary">{successMessage}</Alert>
+            )}
+            <Button className="w-100 mt-3" variant="primary" type="submit">
+              Send Reset Link
+            </Button>
+          </Form>
+    </Container>
   );
 };
 
-export default ForgotPasswordBS;
+export default ForgotPassword;

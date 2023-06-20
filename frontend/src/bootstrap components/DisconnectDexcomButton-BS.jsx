@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import ErrorMessage from "./ErrorMessage";
+import ErrorMessage from "./ErrorMessage-BS";
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 

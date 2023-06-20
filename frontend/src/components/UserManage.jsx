@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import Register from "../components/Register";
 import Login from "../components/Login";
-import ForgotPasswordBS from "../bootstrap components/ForgotPassword-BS";
+import ForgotPassword from "./ForgotPassword";
 
 const UserManage = () => {
     const [showRegister, setShowRegister] = useState(false);
@@ -47,7 +47,7 @@ const UserManage = () => {
           </div>
           {showRegister && <Register />}
           {showLogin && <Login />}
-          {showForgotPassword && <ForgotPasswordBS />}
+          {showForgotPassword && <ForgotPassword />}
         </>
   );
 };

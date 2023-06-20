@@ -1,6 +1,9 @@
 import React, { useState, useContext } from "react";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "./ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -29,42 +32,37 @@ const Login = () => {
   };
 
   return (
-    <div className="column">
-      <form className="box" onSubmit={handleSubmit}>
-        <h1 className="title has-text-centered">Login</h1>
-        <div className="field">
-          <label className="label">Email Address</label>
-          <div className="control">
-            <input
-              type="email"
-              placeholder="Enter email"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
-        </div>
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="control">
-            <input
-              type="password"
-              placeholder="Enter password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-              required
-            />
-          </div>
-        </div>
+    <Container className="d-flex justify-content-center">
+      <Form onSubmit={handleSubmit}>
+        <h1 className="h3 mb-3 text-center">Login</h1>
+        <Form.Group className="mb-3">
+          <Form.Label>Email Address</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            placeholder="Enter password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Form.Group>
         <ErrorMessage message={errorMessage} />
-        <br />
-        <button className="button is-primary" type="submit">Login</button>
-      </form>
-    </div>
+        <Button variant="primary" type="submit" className="w-100 mt-3">
+          Login
+        </Button>
+      </Form>
+    </Container>
   );
 };
 
