@@ -3,7 +3,6 @@ import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
 import Navbar from "../components/Navbar";
-import CurrentGlucoseLevel from "../components/CurrentGlucoseLevel";
 import GraphModal from "../components/GraphModal";
 
 const AppMain = () => {
@@ -37,9 +36,11 @@ const AppMain = () => {
         return (
             <>
                 <Header title={message} />
-                <div className="columns is-centered is-mobile">
-                    <div className="column m-5 is-8 is-offset-2">
-                        <UserManage />
+                <div className="container d-flex-inline justify-content-center">
+                    <div className="row">
+                        <div className="col">
+                            <UserManage />
+                        </div>
                     </div>
                 </div>
             </>

@@ -13,9 +13,8 @@ const UserManage = () => {
 
   return (
 
-    <Card className="d-flex justify-content-center">
-      <Card.Header>
-        <div className="d-flex justify-content-center">
+    <Card className="d-flex-inline justify-content-center">
+      <Card.Header className="d-flex-inline justify-content-center">
           <ButtonGroup>
             <Button
               variant={showRegister ? "primary" : "outline-primary"}
@@ -48,7 +47,6 @@ const UserManage = () => {
               Forgot Password
             </Button>
           </ButtonGroup>
-        </div>
       </Card.Header>
       <Card.Body>
         {showRegister && <Register />}
