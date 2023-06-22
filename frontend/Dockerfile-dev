@@ -1,0 +1,5 @@
+FROM node:lts-alpine as build-step
+WORKDIR /app
+ADD ./package.json ./
+ENV PATH /app/node_modules/.bin:$PATH
+RUN npm install

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-dev
+    container_name: frontend-dev
+    ports:
+      - "9090:9090"
+    volumes:
+      - type: bind
+        source: ./frontend/src
+        target: /app/src
+      - type: bind
+        source: ./frontend/public
+        target: /app/public
+      - type: bind
+        source: ./frontend/index.html
+        target: /app/index.html
+      - type: bind
+        source: ./frontend/package.json
+        target: /app/package.json
+      - type: bind
+        source: ./frontend/vite.config.js
+        target: /app/vite.config.js
+    tty: true
+    working_dir: /app
+    command: "npm run start"
