@@ -20,6 +20,7 @@ const AppMain = () => {
         };
         const response = await fetch("/api/api", requestOptions);
         const data = await response.json();
+        console.log(data)
 
         if (!response.ok) {
             setMessage("Oops, something messed up, no backend connection.");
@@ -47,7 +48,6 @@ const AppMain = () => {
         );
     }
     else if( dexcomConnected !== true ){
-        //TODO: this link pulls from url to get redirect uri for dexcom, clean up and make sure it works
         let host = window.location.origin
         let dexurl = 'https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=' + host + '/VerifyDexcom/&response_type=code&scope=offline_access'
         return (

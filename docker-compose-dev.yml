@@ -1,13 +1,27 @@
 version: '3.8'
 
 services:
+
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
+    container_name: backend-dev
+    volumes:
+      - type: bind
+        source: ./backend/db/
+        target: /backend/db/
+      - type: bind
+        source: ./backend/app
+        target: /backend/app
+    working_dir: /backend/app
+    command: uvicorn main:app --root-path /api --proxy-headers --host 0.0.0.0 --port 8000 --reload
+
   frontend-dev:
     build:
       context: ./frontend
       dockerfile: Dockerfile-dev
     container_name: frontend-dev
-    ports:
-      - "9090:9090"
     volumes:
       - type: bind
         source: ./frontend/src
@@ -25,5 +39,24 @@ services:
         source: ./frontend/vite.config.js
         target: /app/vite.config.js
     tty: true
+    depends_on:
+      - backend-dev
     working_dir: /app
     command: "npm run start"
+
+  caddy-dev:
+    image: caddy:alpine
+    container_name: caddy-dev
+    ports:
+      - "8080:80"
+    volumes:
+      - ./Caddyfile-dev:/etc/caddy/Caddyfile
+      - caddy-data-dev:/data
+      - caddy-config-dev:/config
+    depends_on:
+      - backend-dev
+      - frontend-dev
+
+volumes:
+  caddy-data-dev:
+  caddy-config-dev:
