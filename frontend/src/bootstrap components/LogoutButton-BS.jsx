@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
-import Button from 'react-bootstrap/Button';
 
 import { UserContext } from "../context/UserContext";
 
-const LogoutButton = ({ title }) => {
-  const { authToken, } = useContext(UserContext);
-  const [token, setToken] = authToken;
+const LogoutButton = () => {
+  const {authToken, } = useContext(UserContext);
+  const [, setToken] = authToken;
+
 
   const handleLogout = () => {
     setToken(null);
@@ -13,9 +13,9 @@ const LogoutButton = ({ title }) => {
   };
 
   return (
-    <Button variant="primary" onClick={handleLogout}>
+    <button className="button" onClick={handleLogout}>
       Logout
-    </Button>
+    </button>
   );
 };
 

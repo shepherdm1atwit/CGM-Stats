@@ -1,9 +1,8 @@
 import React, {useState, useContext, useEffect} from "react";
 import ErrorMessage from "./ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
+import {Form, Button, Container} from 'react-bootstrap';
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -44,7 +43,7 @@ const Login = () => {
   return (
     <Container className="d-flex justify-content-center">
       <Form onSubmit={handleSubmit}>
-        <h1 className="h3 mb-3 text-center">Login</h1>
+        <h3 className="mb-3" align="center">Login</h3>
         <Form.Group className="mb-3">
           <Form.Label>Email Address</Form.Label>
           <Form.Control

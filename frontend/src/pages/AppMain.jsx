@@ -2,10 +2,10 @@ import React, {useContext, useEffect, useState} from "react";
 import {UserContext} from "../context/UserContext";
 import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
-import Navbar from "../components/Navbar";
-import GraphModal from "../components/GraphModal";
+import NavBar from "../bootstrap components/NavBar-BS";
+import GraphModal from "../bootstrap components/GraphModal-BS";
 import Container from "react-bootstrap/Container";
-import {Col, Row} from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -39,12 +39,8 @@ const AppMain = () => {
         return (
             <>
                 <Header title={message} />
-                <Container className="d-flex-inline">
-                    <Row>
-                        <Col>
-                            <UserManage />
-                        </Col>
-                    </Row>
+                <Container className="col-5">
+                    <UserManage />
                 </Container>
             </>
         );
@@ -55,10 +51,10 @@ const AppMain = () => {
         return (
             <>
                 <Header title={message} />
-                <div className="columns is-centered is-mobile">
-                    <div className="column m-5 is-8 is-offset-2 has-text-centered">
-                        <a href={dexurl} className="button is-primary"> Connect to Dexcom </a>
-                    </div>
+                <div className="d-flex justify-content-center">
+                    <Button href={dexurl} className="btn btn-primary" type="button">
+                        Connect to Dexcom
+                    </Button>
                 </div>
             </>
         );
@@ -66,13 +62,12 @@ const AppMain = () => {
     else {
         return (
             <>
-                <Navbar />
-
-                <div className="columns is-centered is-mobile">
-                    <div className="column m-5 is-8 is-offset-2 has-text-centered">
+                <NavBar />
+                <Container className="justify-content-center">
+                    <Container className="row">
                         <GraphModal />
-                    </div>
-                </div>
+                    </Container>
+                </Container>
             </>
         );
     }

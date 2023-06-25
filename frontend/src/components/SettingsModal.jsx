@@ -3,8 +3,8 @@ import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 import DisconnectDexcomButton from "./DisconnectDexcomButton";
 
-const SettingsModal = ({ onClose }) => {
-  const [isActive, setIsActive] = useState(true);
+const SettingsModal = () => {
+  const [isActive, setIsActive] = useState(false);
   const { authToken, sessionExp } = useContext(UserContext);
   const [,setSessionExpired] = sessionExp;
   const [token, setToken] = authToken;
@@ -61,11 +61,10 @@ const SettingsModal = ({ onClose }) => {
     }
   };
 
-  const closeModal = () => {
+  const handleClose = () => {
     setIsActive(false);
-    onClose();
-    window.location.reload()
-  };
+    window.location.reload();
+  }
 
   const handleChange = (event) => {
     const { name, value } = event.target;

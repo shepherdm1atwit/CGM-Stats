@@ -50,7 +50,7 @@ const Register = () => {
   return (
     <Container className="d-flex justify-content-center">
       <Form onSubmit={handleSubmit}>
-        <h1 className="h3 mb-3 text-center">Register</h1>
+        <h3 className="mb-3" align="center">Register</h3>
         <Form.Group className="mb-3">
           <Form.Label>Email Address</Form.Label>
           <Form.Control
