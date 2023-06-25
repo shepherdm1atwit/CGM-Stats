@@ -6,7 +6,7 @@ import Alert from 'react-bootstrap/Alert';
 
 const DisconnectDexcomButton = ({ title }) => {
   const { authToken, dexConnect } = useContext(UserContext);
-  const [token,] = authToken;
+  const [token,setToken] = authToken;
   const [, setDexcomConnected] = dexConnect;
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");

@@ -4,7 +4,7 @@ EMAIL_PORT=
 EMAIL_USERNAME=
 EMAIL_PASSWORD=
 EMAIL_FROM=
-USE_TLS=
+USE_TLS=True
 
 # The base domain/subdomain this application will be hosted on, ex: cgmstats.example.com
 HOST_DOMAIN=
@@ -20,6 +20,8 @@ DEXCOM_CLIENT_SECRET=
 
 # Private key to use for generation of JWT Tokens, DO NOT SHARE OR DISCLOSE.
 JWT_PRIVATE_KEY=
+# Expiration time for JWT tokens in minutes - 30 by default
+JWT_EXP_MINUTES=30
 
 # TESTING VALUES BELOW FOR DEVELOPMENT/TROUBLESHOOTING ONLY. LEAVE BLANK FOR NO TEST USER
 # These will determine the email and password that will be created for the test user when the image is first created.

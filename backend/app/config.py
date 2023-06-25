@@ -4,6 +4,7 @@ from pydantic import BaseSettings, EmailStr
 class Settings(BaseSettings):
 
     JWT_PRIVATE_KEY: str
+    JWT_EXP_MINUTES: int
 
     HOST_DOMAIN: str
 

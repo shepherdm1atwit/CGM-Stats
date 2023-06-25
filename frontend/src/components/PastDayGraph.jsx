@@ -3,8 +3,9 @@ import { UserContext } from "../context/UserContext";
 import { VictoryChart, VictoryLine, VictoryTheme, VictoryAxis, VictoryLabel, VictoryArea } from "victory";
 
 const PastDayGraph = () => {
-  const { authToken } = useContext(UserContext);
-  const [token] = authToken;
+  const { authToken, sessionExp } = useContext(UserContext);
+  const [,setSessionExpired] = sessionExp;
+  const [token, setToken] = authToken;
   const [graphData, setGraphData] = useState([]);
   const [isActive, ] = useState(true);
   const [prefs, setPrefs] = useState({ maximum: null, minimum: null });
@@ -21,7 +22,11 @@ const PastDayGraph = () => {
       const response = await fetch("/api/getpastdayegvs", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-        console.log(data.detail);
+          if (data.detail==="Your session has expired."){
+              setSessionExpired(true);
+              setToken(null);
+          }
+        //console.log(data.detail);
       } else {
         setGraphData(data.xy_pairs);
       }
@@ -39,7 +44,13 @@ const PastDayGraph = () => {
         const response = await fetch("/api/getpreferences", requestOptions);
         const data = await response.json();
         if (!response.ok) {
-            throw new Error("Error retrieving preferences from backend.");
+            if (data.detail==="Your session has expired."){
+                setSessionExpired(true);
+                setToken(null);
+            }
+            else {
+                throw new Error("Error retrieving preferences from backend.");
+            }
         }
         setPrefs({ maximum: data.maximum, minimum: data.minimum });
     };

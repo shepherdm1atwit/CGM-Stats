@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import ErrorMessage from "./ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
 import Form from 'react-bootstrap/Form';
@@ -9,7 +9,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {authToken,} = useContext(UserContext);
+  const {authToken, sessionExp} = useContext(UserContext);
+    const [sessionExpired, setSessionExpired] = sessionExp;
   const [,setToken] = authToken;
 
   const handleSubmit = async (e) => {
@@ -30,6 +31,15 @@ const Login = () => {
       setToken(data.access_token);
     }
   };
+
+  useEffect(() => {
+    if (sessionExpired===true){
+      console.log("expired " + sessionExpired)
+      setSessionExpired(false);
+      console.log("expired " + sessionExpired)
+      setErrorMessage("Your session has expired, please log in again.");
+    }
+  },[]);
 
   return (
     <Container className="d-flex justify-content-center">

@@ -8,7 +8,7 @@ import GraphModal from "../components/GraphModal";
 const AppMain = () => {
     const [message, setMessage] = useState("");
     const {authToken, dexConnect} = useContext(UserContext);
-    const [token,] = authToken;
+    const [token, setToken] = authToken;
     const [dexcomConnected,] = dexConnect;
 
     const getWelcomeMessage = async () => {
@@ -20,7 +20,7 @@ const AppMain = () => {
         };
         const response = await fetch("/api/api", requestOptions);
         const data = await response.json();
-        console.log(data)
+        //console.log(data)
 
         if (!response.ok) {
             setMessage("Oops, something messed up, no backend connection.");

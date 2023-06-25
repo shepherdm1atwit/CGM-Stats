@@ -5,8 +5,9 @@ import DisconnectDexcomButton from "./DisconnectDexcomButton";
 
 const SettingsModal = ({ onClose }) => {
   const [isActive, setIsActive] = useState(true);
-  const { authToken } = useContext(UserContext);
-  const [token] = authToken;
+  const { authToken, sessionExp } = useContext(UserContext);
+  const [,setSessionExpired] = sessionExp;
+  const [token, setToken] = authToken;
   const [errorMessage, setErrorMessage] = useState("");
   const [maximumGlucose, setMaximumGlucose] = useState("");
   const [minimumGlucose, setMinimumGlucose] = useState("");
@@ -26,6 +27,10 @@ const SettingsModal = ({ onClose }) => {
         const data = await response.json();
         //console.log(data);
         if (!response.ok) {
+          if (data.detail==="Your session has expired."){
+            setSessionExpired(true);
+            setToken(null);
+          }
           throw new Error("Error retrieving preferences from backend.");
         }
         setData({ maximum: data.maximum, minimum: data.minimum });
@@ -92,6 +97,10 @@ const SettingsModal = ({ onClose }) => {
         const response = await fetch("/api/savepreferences", requestOptions);
         const data = await response.json();
         if (!response.ok) {
+          if (data.detail==="Your session has expired."){
+            setSessionExpired(true);
+            setToken(null);
+          }
           throw new Error("Error sending preferences to backend.");
         }
         closeModal();

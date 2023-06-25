@@ -5,7 +5,8 @@ export const UserContext = createContext();
 export const UserProvider = (props) => {
   const [token, setToken] = useState(sessionStorage.getItem("CGMStatsToken"));
   const [dexcomConnected, setDexcomConnected] = useState("");
-  const value = {authToken: [token, setToken],dexConnect: [dexcomConnected, setDexcomConnected]}
+  let [sessionExpired, setSessionExpired] = useState(false);
+  const value = {authToken: [token, setToken],dexConnect: [dexcomConnected, setDexcomConnected], sessionExp: [sessionExpired, setSessionExpired]}
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -16,10 +17,15 @@ export const UserProvider = (props) => {
           Authorization: "Bearer " + token,
         },
       };
-
       const response = await fetch("/api/me", requestOptions);
+      const data = await response.json()
 
       if (!response.ok) {
+        if (data.detail==="Your session has expired."){
+          setSessionExpired(true);
+        }
+        setSessionExpired(false);
+        setDexcomConnected(false);
         setToken(null);
       }
       else {

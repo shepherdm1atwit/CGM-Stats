@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import {VictoryArea, VictoryAxis, VictoryChart, VictoryLabel, VictoryLine, VictoryTheme} from "victory";
 const BestDay = () => {
-  const { authToken } = useContext(UserContext);
-  const [token] = authToken;
+  const { authToken, sessionExp } = useContext(UserContext);
+  const [token, setToken] = authToken;
+  const [,setSessionExpired] = sessionExp;
   const [bestDay, setBestDay] = useState("");
   const [bestDayStd, setBestDayStd] = useState("");
   const [graphData, setGraphData] = useState([]);
@@ -23,7 +24,11 @@ const BestDay = () => {
       const response = await fetch("/api/getbestday", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-        console.log(data.detail);
+          if (data.detail==="Your session has expired."){
+            setSessionExpired(true);
+            setToken(null);
+          }
+        //console.log(data.detail);
       } else {
         //console.log(data);
         setBestDay(new Date(data.best_day).toLocaleDateString("en-US"));
@@ -45,7 +50,13 @@ const BestDay = () => {
         const response = await fetch("/api/getpreferences", requestOptions);
         const data = await response.json();
         if (!response.ok) {
-          throw new Error("Error retrieving preferences from backend.");
+          if (data.detail==="Your session has expired."){
+            setSessionExpired(true);
+            setToken(null);
+          }
+          else {
+                throw new Error("Error retrieving preferences from backend.");
+            }
         }
         setPrefs({ maximum: data.maximum, minimum: data.minimum });
       }

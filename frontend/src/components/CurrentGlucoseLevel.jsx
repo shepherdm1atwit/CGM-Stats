@@ -4,7 +4,7 @@ import { ArrowDownRight, ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from 're
 
 const CurrentGlucoseLevel = () => {
   const { authToken } = useContext(UserContext);
-  const [token] = authToken;
+  const [token, setToken] = authToken;
   const [currentGlucose, setCurrentGlucose] = useState("");
   const [currentTrend, setCurrentTrend] = useState("");
 
@@ -20,7 +20,11 @@ const CurrentGlucoseLevel = () => {
       const response = await fetch("/api/getcurrentglucose", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-        console.log(data.detail);
+        if (data.detail==="Your session has expired."){
+          setSessionExpired(true);
+          setToken(null);
+        }
+        //console.log(data.detail);
       } else {
         const currentGlucoseValue = data.value;
         setCurrentGlucose(currentGlucoseValue);

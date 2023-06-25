@@ -5,7 +5,7 @@ import LogoutButton from "./LogoutButton";
 
 const Header = ({ title }) => {
   const {authToken, } = useContext(UserContext);
-  const [token, ] = authToken;
+  const [token, setToken] = authToken;
 
 
   return (

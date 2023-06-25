@@ -7,7 +7,7 @@ import {UserContext} from "../context/UserContext";
 const VerifyDexcom = () => {
     const navigate = useNavigate();
     const {authToken,} = useContext(UserContext);
-    const [token,] = authToken;
+    const [token, setToken] = authToken;
     const [queryParameters] = useSearchParams();
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -25,9 +25,13 @@ const VerifyDexcom = () => {
         const data = await response.json();
 
         if (!response.ok) {
+            if (data.detail==="Your session has expired."){
+                setSessionExpired(true);
+                setToken(null);
+            }
             setErrorMessage(data.detail);
         } else {
-            console.log("Successful Verification");
+            //console.log("Successful Verification");
         }
     };
 

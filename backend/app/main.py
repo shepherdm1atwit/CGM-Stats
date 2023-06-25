@@ -38,10 +38,9 @@ async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends
     if not user:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
 
-    return await services.create_token(user)
+    return await services.create_jwt_token(user)
 
-
-@app.get("/me", response_model=schemas.User)
+@app.get("/me")
 async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
 

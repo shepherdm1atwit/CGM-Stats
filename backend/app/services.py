@@ -4,6 +4,7 @@ import schemas
 import jwt
 import requests
 from fastapi import Depends, security, HTTPException, Request
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from config import settings
 from passlib.hash import bcrypt
@@ -15,6 +16,7 @@ from hashlib import sha256
 oauth2schema = security.OAuth2PasswordBearer(tokenUrl="/token")
 
 JWT_SECRET = settings.JWT_PRIVATE_KEY
+JWT_EXP_MINUTES = settings.JWT_EXP_MINUTES
 
 
 def get_db():
@@ -126,24 +128,37 @@ async def verify_email(token: str, db: Session):
 async def authenticate_user(email: str, password: str, db: Session):
     user = await get_user_by_email(db=db, email=email)
 
-    if not user:
-        return False
-
-    if not user.verify_password(password):
-        return False
-
-    if not user.verified_email:
-        return False
-
-    return user
+    if user is not None and user.verify_password(password) and user.verified_email:
+        return user
+    return False
 
 
-async def create_token(user: dbUser):
-    db_user = schemas.User.from_orm(user)
-
-    token = jwt.encode(db_user.dict(), JWT_SECRET)
+async def create_jwt_token(user: dbUser):
+    user = schemas.User.from_orm(user)
+    payload = user.dict()
+    payload["exp"] = datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
+    token = jwt.encode(payload, JWT_SECRET)
 
     return dict(access_token=token, token_type="bearer")
+
+
+async def get_current_user(
+        db: Session = Depends(get_db),
+        token: str = Depends(oauth2schema),
+):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        user = db.query(dbUser).get(payload["id"])
+    except jwt.exceptions.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401, detail="Your session has expired."
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=401, detail="Invalid Email or Password"
+        )
+
+    return schemas.User.from_orm(user)
 
 
 async def check_dexcom_connection(request: Request, user: schemas.User, db: Session):
@@ -188,21 +203,6 @@ async def refresh_dexcom_tokens(request: Request, db_user: dbUser, db: Session):
     db_user.dex_access_token = data["access_token"]
     db_user.dex_refresh_token = data["refresh_token"]
     db.commit()
-
-
-async def get_current_user(
-        db: Session = Depends(get_db),
-        token: str = Depends(oauth2schema),
-):
-    try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        user = db.query(dbUser).get(payload["id"])
-    except:
-        raise HTTPException(
-            status_code=401, detail="Invalid Email or Password"
-        )
-
-    return schemas.User.from_orm(user)
 
 
 # Add user in database to avoid full account creation process during development/testing.

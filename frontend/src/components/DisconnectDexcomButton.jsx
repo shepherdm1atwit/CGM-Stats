@@ -4,7 +4,7 @@ import ErrorMessage from "./ErrorMessage";
 
 const DisconnectDexcomButton = ({ title }) => {
   const {authToken, dexConnect} = useContext(UserContext);
-  const [token,] = authToken;
+  const [token, setToken] = authToken;
   const [, setDexcomConnected] = dexConnect;
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");

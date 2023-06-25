@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, {useState, useContext, useEffect} from "react";
 import ErrorMessage from "./ErrorMessage";
 import { UserContext } from "../context/UserContext";
 
@@ -6,7 +6,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {authToken,} = useContext(UserContext);
+  const {authToken,sessionExp} = useContext(UserContext);
+  const [sessionExpired,setSessionExpired] = sessionExp;
   const [,setToken] = authToken;
 
   const handleSubmit = async (e) => {
@@ -27,6 +28,13 @@ const Login = () => {
       setToken(data.access_token);
     }
   };
+
+  useEffect(() => {
+    if (sessionExpired !== false){
+      setErrorMessage("Your session has expired, please log in again.");
+      setSessionExpired(false);
+    }
+  },[]);
 
   return (
     <div className="column">
