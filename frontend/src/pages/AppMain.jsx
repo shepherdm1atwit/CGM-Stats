@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
 import Navbar from "../components/Navbar";
 import GraphModal from "../components/GraphModal";
+import Container from "react-bootstrap/Container";
+import {Col, Row} from "react-bootstrap";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -37,13 +39,13 @@ const AppMain = () => {
         return (
             <>
                 <Header title={message} />
-                <div className="container d-flex-inline justify-content-center">
-                    <div className="row">
-                        <div className="col">
+                <Container className="d-flex-inline">
+                    <Row>
+                        <Col>
                             <UserManage />
-                        </div>
-                    </div>
-                </div>
+                        </Col>
+                    </Row>
+                </Container>
             </>
         );
     }
