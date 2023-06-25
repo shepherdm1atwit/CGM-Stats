@@ -2,3 +2,4 @@
 /backend/app/app.config
 /backend/.idea/
 /.idea
+/frontend/node_modules
