@@ -6,6 +6,8 @@ import NavBar from "../bootstrap components/NavBar-BS";
 import GraphModal from "../bootstrap components/GraphModal-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import {Col, Row} from "react-bootstrap";
+import {User} from "react-feather";
 
 const AppMain = () => {
     const [message, setMessage] = useState("");
@@ -38,9 +40,19 @@ const AppMain = () => {
     if( token === null ){
         return (
             <>
+                {/* COMMENTED OUT FOR NOW. MAY COME BACK!
                 <Header title={message} />
-                <Container className="col-5">
-                    <UserManage />
+                */}
+                <Container className="vh-100">
+                    <Row className="vh-100 align-content-center">
+                        <Col className="justify-content-center">
+                            <h1>Welcome to CGM Stats!</h1>
+                            <p>The one stop shop for all of your self-monitoring needs.</p>
+                        </Col>
+                        <Col className="d-flex justify-content-center">
+                            <UserManage />
+                        </Col>
+                    </Row>
                 </Container>
             </>
         );

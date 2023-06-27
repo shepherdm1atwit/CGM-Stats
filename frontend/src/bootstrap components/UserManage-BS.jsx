@@ -13,11 +13,11 @@ const UserManage = () => {
 
   return (
 
-    <Card>
-      <Card.Header className="justify-content-center">
+    <Card className="w-75">
+      <Card.Header className="justify-content-center p-0">
           <ButtonGroup className="w-100">
                 <Button
-                  className="rounded-0 col-3"
+                  className="rounded-0 col-3 btn-lg"
                   variant={showRegister ? "primary" : "outline-primary"}
                   onClick={() => {
                     setShowRegister(true);
@@ -28,7 +28,7 @@ const UserManage = () => {
                   Register
                 </Button>
                 <Button
-                  className="rounded-0 col-3"
+                  className="rounded-0 col-3 btn-lg"
                   variant={showLogin ? "primary" : "outline-primary"}
                   onClick={() => {
                     setShowRegister(false);
@@ -39,7 +39,7 @@ const UserManage = () => {
                   Login
                 </Button>
                 <Button
-                  className="rounded-0 col-3"
+                  className="rounded-0 col-3 btn-lg"
                   variant={showForgotPassword ? "primary" : "outline-primary"}
                   onClick={() => {
                     setShowRegister(false);
@@ -47,9 +47,8 @@ const UserManage = () => {
                     setShowForgotPassword(true);
                   }}
                 >
-                  Forgot Password
+                  Reset Password
                 </Button>
-
           </ButtonGroup>
       </Card.Header>
       <Card.Body>

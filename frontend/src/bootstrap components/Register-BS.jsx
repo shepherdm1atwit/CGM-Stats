@@ -52,17 +52,6 @@ const Register = () => {
       <Form onSubmit={handleSubmit}>
         <h3 className="mb-3" align="center">Register</h3>
         <Form.Group className="mb-3">
-          <Form.Label>Email Address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
           <Form.Label>First Name</Form.Label>
           <Form.Control
             type="text"
@@ -70,6 +59,17 @@ const Register = () => {
             autoComplete="given-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Email Address</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </Form.Group>
