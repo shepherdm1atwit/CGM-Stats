@@ -1,20 +1,19 @@
-import React, {useState, useContext, useEffect} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import ErrorMessage from "./ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
-import {Form, Button, Container} from 'react-bootstrap';
-
+import { Form, Button, Container, FloatingLabel } from "react-bootstrap";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const {authToken, sessionExp} = useContext(UserContext);
-    const [sessionExpired, setSessionExpired] = sessionExp;
-  const [,setToken] = authToken;
+  const { authToken, sessionExp } = useContext(UserContext);
+  const [sessionExpired, setSessionExpired] = sessionExp;
+  const [, setToken] = authToken;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-        const requestOptions = {
+    const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: JSON.stringify(
@@ -32,42 +31,46 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (sessionExpired===true){
-      console.log("expired " + sessionExpired)
+    if (sessionExpired === true) {
+      console.log("expired " + sessionExpired);
       setSessionExpired(false);
-      console.log("expired " + sessionExpired)
+      console.log("expired " + sessionExpired);
       setErrorMessage("Your session has expired, please log in again.");
     }
-  },[]);
+  }, []);
 
   return (
-    <Container className="d-flex justify-content-center">
+    <Container className="w-75 justify-content-center">
       <Form onSubmit={handleSubmit}>
-        <h3 className="mb-3" align="center">Login</h3>
+        {/* <h3 className="mb-3" align="center">Welcome Back</h3>*/}
+
         <Form.Group className="mb-3">
-          <Form.Label>Email Address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Email Address">
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
+
         <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Enter password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Password">
+            <Form.Control
+              type="password"
+              placeholder="Enter password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
         <ErrorMessage message={errorMessage} />
-        <Button variant="primary" type="submit" className="w-100 mt-3">
+        <Button variant="primary" type="submit" className="w-100 btn-lg">
           Login
         </Button>
       </Form>

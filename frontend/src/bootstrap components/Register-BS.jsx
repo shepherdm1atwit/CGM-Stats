@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Alert from 'react-bootstrap/Alert';
-import Container from 'react-bootstrap/Container';
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
+import Container from "react-bootstrap/Container";
 import ErrorMessage from "./ErrorMessage-BS";
+import { FloatingLabel } from "react-bootstrap";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,11 @@ const Register = () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, name: name, hashed_password: password }),
+      body: JSON.stringify({
+        email: email,
+        name: name,
+        hashed_password: password,
+      }),
     };
 
     const response = await fetch("/api/register", requestOptions);
@@ -48,59 +53,62 @@ const Register = () => {
   };
 
   return (
-    <Container className="d-flex justify-content-center">
+    <Container className="w-75 justify-content-center">
       <Form onSubmit={handleSubmit}>
-        <h3 className="mb-3" align="center">Register</h3>
+        {/* <h3 className="mb-3" align="center">Register</h3> */}
         <Form.Group className="mb-3">
-          <Form.Label>First Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter name"
-            autoComplete="given-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Your First Name">
+            <Form.Control
+              type="text"
+              placeholder="Enter name"
+              autoComplete="given-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Email Address</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Enter email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Your Email Address">
+            <Form.Control
+              type="email"
+              placeholder="Enter email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Enter password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Enter Password">
+            <Form.Control
+              type="password"
+              placeholder="Enter password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Confirm Password</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Enter password"
-            autoComplete="new-password"
-            value={confirmationPassword}
-            onChange={(e) => setConfirmationPassword(e.target.value)}
-            required
-          />
+          <FloatingLabel label="Confirm Password">
+            <Form.Control
+              type="password"
+              placeholder="Enter password"
+              autoComplete="new-password"
+              value={confirmationPassword}
+              onChange={(e) => setConfirmationPassword(e.target.value)}
+              required
+            />
+          </FloatingLabel>
         </Form.Group>
         <ErrorMessage message={errorMessage} color="red" />
-        {successMessage && (
-          <Alert variant="primary">{successMessage}</Alert>
-        )}
-        <Button variant="primary" type="submit" className="w-100 mt-3">
-          Register
+        {successMessage && <Alert variant="primary">{successMessage}</Alert>}
+
+        <Button variant="primary" type="submit" className="w-100 btn-lg">
+          Register!
         </Button>
       </Form>
     </Container>
