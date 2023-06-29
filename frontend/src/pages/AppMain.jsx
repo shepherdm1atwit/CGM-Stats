@@ -38,7 +38,7 @@ const AppMain = () => {
     getWelcomeMessage();
   }, []);
 
-  if (token === null) {
+  if (token === "null") {
     return (
       <div className="bg-light">
         {/* COMMENTED OUT FOR NOW. MAY COME BACK!

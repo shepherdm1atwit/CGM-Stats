@@ -1,17 +1,25 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import {VictoryArea, VictoryAxis, VictoryChart, VictoryLabel, VictoryLine, VictoryTheme} from "victory";
+import {
+  VictoryArea,
+  VictoryAxis,
+  VictoryChart,
+  VictoryLabel,
+  VictoryLine,
+  VictoryTheme,
+} from "victory";
+
 const BestDay = () => {
   const { authToken, sessionExp } = useContext(UserContext);
   const [token, setToken] = authToken;
-  const [,setSessionExpired] = sessionExp;
+  const [, setSessionExpired] = sessionExp;
   const [bestDay, setBestDay] = useState("");
   const [bestDayStd, setBestDayStd] = useState("");
   const [graphData, setGraphData] = useState([]);
-  const [isActive, ] = useState(true);
+  const [isActive] = useState(true);
   const [, setErrorMessage] = useState("");
   const [prefs, setPrefs] = useState({ maximum: null, minimum: null });
-      
+
   useEffect(() => {
     const getBestDay = async () => {
       const requestOptions = {
@@ -24,10 +32,10 @@ const BestDay = () => {
       const response = await fetch("/api/getbestday", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-          if (data.detail==="Your session has expired."){
-            setSessionExpired(true);
-            setToken(null);
-          }
+        if (data.detail === "Your session has expired.") {
+          setSessionExpired(true);
+          setToken("null");
+        }
         //console.log(data.detail);
       } else {
         //console.log(data);
@@ -50,17 +58,15 @@ const BestDay = () => {
         const response = await fetch("/api/getpreferences", requestOptions);
         const data = await response.json();
         if (!response.ok) {
-          if (data.detail==="Your session has expired."){
+          if (data.detail === "Your session has expired.") {
             setSessionExpired(true);
-            setToken(null);
+            setToken("null");
+          } else {
+            throw new Error("Error retrieving preferences from backend.");
           }
-          else {
-                throw new Error("Error retrieving preferences from backend.");
-            }
         }
         setPrefs({ maximum: data.maximum, minimum: data.minimum });
-      }
-      catch (error) {
+      } catch (error) {
         setErrorMessage(error.message);
       }
     };
@@ -71,14 +77,11 @@ const BestDay = () => {
     let hour = new Date(x).getHours();
     if (hour > 12) {
       return hour - 12 + "pm";
-    }
-    else if (hour === 12) {
+    } else if (hour === 12) {
       return 12 + "pm";
-    }
-    else if (hour === 0) {
+    } else if (hour === 0) {
       return 12 + "am";
-    }
-    else {
+    } else {
       return hour + "am";
     }
   };
@@ -86,7 +89,7 @@ const BestDay = () => {
   const maxPref = prefs.maximum !== null ? parseInt(prefs.maximum) : null;
   const minPref = prefs.minimum !== null ? parseInt(prefs.minimum) : null;
 
-  if(maxPref != null && minPref != null){
+  if (maxPref != null && minPref != null) {
     return (
       <div className="box">
         <p style={{ textAlign: "center" }}>
@@ -117,13 +120,15 @@ const BestDay = () => {
             domain={{ y: [minPref, maxPref] }}
           />
 
-          <VictoryAxis tickFormat={(x) => formatTick(x)} style={{ tickLabels: { fontSize: 6, angle: 60 } }} />
+          <VictoryAxis
+            tickFormat={(x) => formatTick(x)}
+            style={{ tickLabels: { fontSize: 6, angle: 60 } }}
+          />
           <VictoryAxis dependentAxis />
         </VictoryChart>
       </div>
     );
-  }
-  else {
+  } else {
     return (
       <div className="box">
         <p style={{ textAlign: "center" }}>
@@ -141,13 +146,15 @@ const BestDay = () => {
             }}
             data={graphData}
           />
-          <VictoryAxis tickFormat={(x) => formatTick(x)} style={{ tickLabels: { fontSize: 6, angle: 60 } }} />
+          <VictoryAxis
+            tickFormat={(x) => formatTick(x)}
+            style={{ tickLabels: { fontSize: 6, angle: 60 } }}
+          />
           <VictoryAxis dependentAxis />
         </VictoryChart>
       </div>
     );
   }
-
 };
 
 export default BestDay;

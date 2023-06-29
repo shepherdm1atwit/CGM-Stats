@@ -1,6 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { ArrowDownRight, ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from 'react-feather';
+import {
+  ArrowDownRight,
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpRight,
+} from "react-feather";
 
 const CurrentGlucoseLevel = () => {
   const { authToken } = useContext(UserContext);
@@ -20,9 +26,9 @@ const CurrentGlucoseLevel = () => {
       const response = await fetch("/api/getcurrentglucose", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-        if (data.detail==="Your session has expired."){
+        if (data.detail === "Your session has expired.") {
           setSessionExpired(true);
-          setToken(null);
+          setToken("null");
         }
         //console.log(data.detail);
       } else {
@@ -81,9 +87,31 @@ const CurrentGlucoseLevel = () => {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ marginBottom: "0.5rem", fontSize: "0.8rem", fontWeight: "bold" }}>Current Glucose Level</div>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          marginBottom: "0.5rem",
+          fontSize: "0.8rem",
+          fontWeight: "bold",
+        }}
+      >
+        Current Glucose Level
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <div
           style={{
             display: "flex",

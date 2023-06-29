@@ -1,6 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { ArrowDownRight, ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from 'react-feather';
+import {
+  ArrowDownRight,
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpRight,
+} from "react-feather";
 import Card from "react-bootstrap/Card";
 
 const CurrentGlucoseLevel = () => {
@@ -21,9 +27,9 @@ const CurrentGlucoseLevel = () => {
       const response = await fetch("/api/getcurrentglucose", requestOptions);
       const data = await response.json();
       if (!response.ok) {
-        if (data.detail==="Your session has expired."){
+        if (data.detail === "Your session has expired.") {
           setSessionExpired(true);
-          setToken(null);
+          setToken("null");
         }
         //console.log(data.detail);
       } else {
@@ -82,32 +88,41 @@ const CurrentGlucoseLevel = () => {
   }
 
   return (
-      <Card>
-        <h2 className="m-0" align="center">Most Recent EGV</h2>
-        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100px",
-              height: "100px",
-              borderRadius: "50%",
-              backgroundColor: "#4caf50",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "2rem",
-              marginRight: "1rem",
-              margin: "1rem"
-            }}
-          >
+    <Card>
+      <h2 className="m-0" align="center">
+        Most Recent EGV
+      </h2>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100px",
+            height: "100px",
+            borderRadius: "50%",
+            backgroundColor: "#4caf50",
+            color: "white",
+            fontWeight: "bold",
+            fontSize: "2rem",
+            marginRight: "1rem",
+            margin: "1rem",
+          }}
+        >
           <div>{currentGlucose}</div>
           <div style={{ fontSize: "0.8rem" }}>mg/dl</div>
         </div>
         {arrowIcon && <span style={{ color: arrowColor }}>{arrowIcon}</span>}
-      </div></Card>
-
+      </div>
+    </Card>
   );
 };
 

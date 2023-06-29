@@ -3,12 +3,11 @@ import React, { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 
 const LogoutButton = ({ title }) => {
-  const {authToken, } = useContext(UserContext);
-  const [token, setToken] = authToken;
-
+  const { authToken } = useContext(UserContext);
+  const [, setToken] = authToken;
 
   const handleLogout = () => {
-    setToken(null);
+    setToken("null");
     sessionStorage.setItem("CGMStatsToken", null);
   };
 

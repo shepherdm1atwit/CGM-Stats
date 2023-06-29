@@ -1,47 +1,19 @@
-import React, {useContext, useEffect, useState} from "react";
-import {Modal, Button, Form} from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
+import { Modal, Button, Form } from "react-bootstrap";
 import ErrorMessage from "../components/ErrorMessage";
-import {UserContext} from "../context/UserContext";
+import { UserContext } from "../context/UserContext";
 
 const SettingsModal = () => {
+  const { authToken, userPrefs, dexConnect, sessionExp } =
+    useContext(UserContext);
   const [isActive, setIsActive] = useState(false);
   const [maximumGlucose, setMaximumGlucose] = useState("");
   const [minimumGlucose, setMinimumGlucose] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const { authToken, dexConnect, sessionExp } = useContext(UserContext);
-  const [,setSessionExpired] = sessionExp;
+  const [, setSessionExpired] = sessionExp;
   const [token, setToken] = authToken;
-  const [data, setData] = useState({ maximum: null, minimum: null });
+  const [prefs] = userPrefs;
   const [, setDexcomConnected] = dexConnect;
-
-  useEffect(() => {
-    const getPreferences = async () => {
-      try {
-        const requestOptions = {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        };
-        const response = await fetch("/api/getpreferences", requestOptions);
-        const data = await response.json();
-        //console.log(data);
-        if (!response.ok) {
-          if (data.detail==="Your session has expired."){
-            setSessionExpired(true);
-            setToken(null);
-          }
-          throw new Error("Error retrieving preferences from backend.");
-        }
-        setData({ maximum: data.maximum, minimum: data.minimum });
-      }
-      catch (error) {
-        setErrorMessage(error.message);
-      }
-    };
-      getPreferences();
-  },[isActive]);
 
   const handleClose = () => setIsActive(false);
   const handleShow = () => setIsActive(true);
@@ -50,9 +22,13 @@ const SettingsModal = () => {
     const maxGlucose = parseInt(maximumGlucose, 10);
     const minGlucose = parseInt(minimumGlucose, 10);
     if (maxGlucose <= minGlucose) {
-      setErrorMessage("Maximum glucose value must be higher than minimum glucose value");
+      setErrorMessage(
+        "Maximum glucose value must be higher than minimum glucose value"
+      );
     } else if (maxGlucose === 0 || minGlucose === 0) {
-      setErrorMessage("Maximum and minimum glucose values must be greater than 0");
+      setErrorMessage(
+        "Maximum and minimum glucose values must be greater than 0"
+      );
     } else {
       try {
         const requestOptions = {
@@ -66,9 +42,9 @@ const SettingsModal = () => {
         const response = await fetch("/api/savepreferences", requestOptions);
         const data = await response.json();
         if (!response.ok) {
-          if (data.detail==="Your session has expired."){
+          if (data.detail === "Your session has expired.") {
             setSessionExpired(true);
-            setToken(null);
+            setToken("null");
           }
           throw new Error("Error sending preferences to backend.");
         }
@@ -81,46 +57,44 @@ const SettingsModal = () => {
   };
 
   const deletePreferences = async () => {
-      const requestOptions = {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-      };
-      const response = await fetch("/api/deletepreferences", requestOptions);
-      const data = await response.json();
-      if( !response.ok ){
-        setErrorMessage(data.detail)
-      }
-      else{
-        setErrorMessage("")
-        handleClose()
-        window.location.reload();
-      }
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
     };
+    const response = await fetch("/api/deletepreferences", requestOptions);
+    const data = await response.json();
+    if (!response.ok) {
+      setErrorMessage(data.detail);
+    } else {
+      setErrorMessage("");
+      handleClose();
+      window.location.reload();
+    }
+  };
 
   const handleDisconnect = async () => {
-      const requestOptions = {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-      };
-      const response = await fetch("/api/disconnectdexcom", requestOptions);
-      const data = await response.json();
-      if( !response.ok ){
-          if (data.detail==="Your session has expired."){
-            setSessionExpired(true);
-            setToken(null);
-          }
-          setErrorMessage(data.detail)
+    const requestOptions = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    };
+    const response = await fetch("/api/disconnectdexcom", requestOptions);
+    const data = await response.json();
+    if (!response.ok) {
+      if (data.detail === "Your session has expired.") {
+        setSessionExpired(true);
+        setToken("null");
       }
-      else{
-          setErrorMessage("")
-          setDexcomConnected(false)
-      }
+      setErrorMessage(data.detail);
+    } else {
+      setErrorMessage("");
+      setDexcomConnected(false);
+    }
   };
 
   return (
@@ -135,7 +109,9 @@ const SettingsModal = () => {
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
-              <Form.Label>{`Current Maximum: ${data.maximum || "-"} (mg/dL)`}</Form.Label>
+              <Form.Label>{`Current Maximum: ${
+                prefs.maximum || "-"
+              } (mg/dL)`}</Form.Label>
               <Form.Control
                 type="number"
                 placeholder="Maximum preferred blood glucose (mg/dL)"
@@ -145,7 +121,9 @@ const SettingsModal = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>{`Current Minimum: ${data.minimum || "-"} (mg/dL)`}</Form.Label>
+              <Form.Label>{`Current Minimum: ${
+                prefs.minimum || "-"
+              } (mg/dL)`}</Form.Label>
               <Form.Control
                 type="number"
                 placeholder="Minimum preferred blood glucose (mg/dL)"
@@ -170,6 +148,6 @@ const SettingsModal = () => {
       </Modal>
     </>
   );
-}
+};
 
 export default SettingsModal;
