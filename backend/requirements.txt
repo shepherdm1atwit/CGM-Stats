@@ -2,7 +2,8 @@ fastapi
 sqlalchemy
 sqlalchemy_utils
 passlib[bcrypt]
-pydantic[dotenv]
+pydantic==1.*
+python-dotenv
 python-multipart
 PyJWT
 fastapi_mail
