@@ -12,7 +12,7 @@ const UserManage = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   return (
-    <Card className="w-75">
+    <Card className="w-100">
       <Card.Header className="justify-content-center p-0">
         <ButtonGroup className="w-100">
           <Button

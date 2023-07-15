@@ -40,20 +40,20 @@ const AppMain = () => {
 
   if (token === "null") {
     return (
-      <div className="bg-light">
+      <div className="vh-100 bg-light">
         {/* COMMENTED OUT FOR NOW. MAY COME BACK!
                 <Header title={message} /> */}
 
-        <Container className="vh-100 vw-100 m-auto justify-content-center">
-          <Row className="vh-100 align-content-center">
-            <Col className=" align-self-center col-12 col-s-10 col-lg-6">
+        <Container className="vw-100">
+          <Row className="vh-100 row-cols-1 row-cols-sm-1 row-cols-lg-2">
+            <Col className="align-self-end align-self-lg-center">
               <h1 className="fw-bold squash">Welcome to CGM Stats!</h1>
               <div className="border-bottom w-75"></div>
               <p className="expand pt-2">
                 The one stop shop for all of your self-monitoring needs.
               </p>
             </Col>
-            <Col className=" justify-content-center col-12 col-s-10 col-lg-6">
+            <Col className="align-self-center pt-0 p-2 pt-lg-0 p-lg-3">
               <UserManage />
             </Col>
           </Row>
