@@ -38,7 +38,7 @@ const UserManage = () => {
             Login
           </Button>
           <Button
-            className=" rounded-0 col-3 btn-lg"
+            className="rounded-0 col-3 btn-lg"
             variant={showForgotPassword ? "primary" : "outline-primary"}
             onClick={() => {
               setShowRegister(false);
