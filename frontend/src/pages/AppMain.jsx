@@ -46,9 +46,9 @@ const AppMain = () => {
 
         <Container className="vw-100">
           <Row className="vh-100 row-cols-1 row-cols-sm-1 row-cols-lg-2">
-            <Col className="align-self-end align-self-lg-center">
+            <Col className="align-self-end align-self-lg-center text-center">
               <h1 className="fw-bold squash">Welcome to CGM Stats!</h1>
-              <div className="border-bottom w-75"></div>
+              <div className="border-bottom mx-5"></div>
               <p className="expand pt-2">
                 The one stop shop for all of your self-monitoring needs.
               </p>
