@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import { Carousel, Modal } from 'react-bootstrap';
 import CurrentGlucoseLevel from "./CurrentGlucoseLevel-BS";
 import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
-import {Modal} from "react-bootstrap";
 
 const graphs = [
     <CurrentGlucoseLevel />,
@@ -25,11 +25,15 @@ const GraphModal = () => {
 
   return (
     <>
-      {graphs.map((graph, index) => (
-        <div key={index} className="graph" onClick={() => handleGraphClick(graph)}>
-          {graph}
-        </div>
-      ))}
+      <Carousel>
+        {graphs.map((graph, index) => (
+          <Carousel.Item key={index} onClick={() => handleGraphClick(graph)}>
+            <div className="graph">
+              {graph}
+            </div>
+          </Carousel.Item>
+        ))}
+      </Carousel>
       {selectedGraph && (
         <Modal className="modal-xl" show={isActive} onHide={handleClose}>
           <Modal.Header closeButton />
