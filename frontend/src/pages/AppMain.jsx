@@ -6,7 +6,7 @@ import NavBar from "../bootstrap components/NavBar-BS";
 import GraphModal from "../bootstrap components/GraphModal-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { Col, Row } from "react-bootstrap";
+import { Col, Modal, Row } from "react-bootstrap";
 import { User } from "react-feather";
 import "../custom.scss";
 
@@ -38,6 +38,13 @@ const AppMain = () => {
     getWelcomeMessage();
   }, []);
 
+  {
+    /* below are used for the warning modal shown before connecting to dexcom */
+  }
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   if (token === "null") {
     return (
       <div className="vh-100 bg-light">
@@ -66,13 +73,35 @@ const AppMain = () => {
       "https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=" +
       host +
       "/VerifyDexcom/&response_type=code&scope=offline_access";
+
     return (
       <>
         <Header title={message} />
         <div className="d-flex justify-content-center">
-          <Button href={dexurl} className="btn btn-primary" type="button">
-            Connect to Dexcom
+          <Button variant="primary" onClick={handleShow}>
+            Connect CGM Stats to Dexcom
           </Button>
+
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title className="">Connect to Dexcom!</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Logging in to Dexcom via CGM Stats does not grant CGM Stats or its
+              authors visibility of your Dexcom account login information. We
+              use a secure connection that directly pipes your glucose data from
+              their servers into our visualizers. That's it!
+              <br />
+              <br />
+              To connect to Dexcom, you will automatically be briefly taken away
+              from, and returned to CGM Stats.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" href={dexurl} onClick={handleClose}>
+                Understood. Connect me!
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </>
     );

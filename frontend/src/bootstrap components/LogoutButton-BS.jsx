@@ -13,7 +13,7 @@ const LogoutButton = () => {
 
   return (
     <button className="button" onClick={handleLogout}>
-      Logout
+      Logout of CGM Stats
     </button>
   );
 };
