@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import { Col, Modal, Row } from "react-bootstrap";
 import { User } from "react-feather";
 import "../custom.scss";
+import GraphModalMain from "../bootstrap components/GraphModalMain-BS";
 
 const AppMain = () => {
   const [message, setMessage] = useState("");
@@ -111,6 +112,12 @@ const AppMain = () => {
         <NavBar />
         <Container className="justify-content-center">
           <Container className="row">
+            <GraphModalMain />
+          </Container>
+          <Container className="row">
+            <div className="text-center mt-4 mb-4">
+              <h2>Explore more graphs here</h2>
+            </div>
             <GraphModal />
           </Container>
         </Container>

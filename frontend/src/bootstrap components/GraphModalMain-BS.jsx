@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
 import { Modal } from 'react-bootstrap';
 import CurrentGlucoseLevel from "./CurrentGlucoseLevel-BS";
 import PastDayGraph from "./PastDayGraph-BS";
@@ -12,25 +10,7 @@ const graphs = [
     <BestDayGraph />
 ];
 
-const responsive = {
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 3,
-    slidesToSlide: 1 // optional, default to 1.
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 2,
-    slidesToSlide: 1 // optional, default to 1.
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1,
-    slidesToSlide: 1 // optional, default to 1.
-  }
-};
-
-const GraphModal = () => {
+const GraphModalMain = () => {
   const [selectedGraph, setSelectedGraph] = useState(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -45,24 +25,13 @@ const GraphModal = () => {
 
   return (
     <>
-      <Carousel
-        swipeable={false}
-        draggable={false}
-        showDots={true}
-        responsive={responsive}
-        infinite={true}
-        autoPlaySpeed={1000}
-        keyBoardControl={true}
-        customTransition="all .5"
-        transitionDuration={500}
-        containerClass="carousel-container"
-      >
+      <div className="graph-container" style={{ paddingLeft: "20%", paddingRight: "20%" }}>
         {graphs.map((graph, index) => (
           <div className="graph" key={index} onClick={() => handleGraphClick(graph)}>
             {graph}
           </div>
         ))}
-      </Carousel>
+      </div>
       {selectedGraph && (
         <Modal className="modal-xl" show={isActive} onHide={handleClose}>
           <Modal.Header closeButton />
@@ -75,4 +44,4 @@ const GraphModal = () => {
   );
 };
 
-export default GraphModal;
+export default GraphModalMain;
