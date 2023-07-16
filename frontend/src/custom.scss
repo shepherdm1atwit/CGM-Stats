@@ -12,4 +12,9 @@
   letter-spacing: .6px;
 }
 
+.justified
+{
+  text-align: justify;
+  text-justify: inter-word;
+}
 @import "bootstrap";

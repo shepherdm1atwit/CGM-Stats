@@ -42,8 +42,12 @@ const AppMain = () => {
     /* below are used for the warning modal shown before connecting to dexcom */
   }
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const handleCloseWarningModal = () => setShow(false);
+  const handleShowWarningModal = () => setShow(true);
+
+  const goBack = () => {
+    setToken("null");
+  };
 
   if (token === "null") {
     return (
@@ -76,33 +80,47 @@ const AppMain = () => {
 
     return (
       <>
-        <Header title={message} />
-        <div className="d-flex justify-content-center">
-          <Button variant="primary" onClick={handleShow}>
-            Connect CGM Stats to Dexcom
-          </Button>
-
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title className="">Connect to Dexcom!</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+        {/*<Header title={message} />*/}
+        <Container className="vh-100 d-flex justify-content-center align-items-center overflow-visible">
+          <Col className="col-8 col-lg-4">
+            <h1 className="text-center border-bottom">Connect to Dexcom...</h1>
+            <p className="text-center">
               Logging in to Dexcom via CGM Stats does not grant CGM Stats or its
               authors visibility of your Dexcom account login information. We
               use a secure connection that directly pipes your glucose data from
-              their servers into our visualizers. That's it!
-              <br />
-              <br />
-              To connect to Dexcom, you will automatically be briefly taken away
-              from, and returned to CGM Stats.
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" href={dexurl} onClick={handleClose}>
-                Understood. Connect me!
+              their servers into our visualizers.
+              <br /> That's it!
+            </p>
+            <Row>
+              <Button variant="primary" onClick={handleShowWarningModal}>
+                Connect CGM Stats to Dexcom!
               </Button>
-            </Modal.Footer>
-          </Modal>
-        </div>
+              <Modal show={show} onHide={handleCloseWarningModal}>
+                <Modal.Header closeButton>
+                  <Modal.Title className="">Before you go...</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  To connect to Dexcom, you will automatically be briefly taken
+                  away from, and returned to CGM Stats.
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button
+                    variant="primary"
+                    href={dexurl}
+                    onClick={handleCloseWarningModal}
+                  >
+                    Understood. Connect me!
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            </Row>
+            <Row className="justify-content-center col-3 mt-3">
+              <Button onClick={goBack} variant="outline-secondary" className="">
+                Go Back
+              </Button>
+            </Row>
+          </Col>
+        </Container>
       </>
     );
   } else {
