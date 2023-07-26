@@ -46,7 +46,7 @@ const AppMain = () => {
 
   if (token === "null") {
     return (
-      <div className="vh-100 bg-light">
+      <div className="vh-100 bg-success-subtle">
         {/* COMMENTED OUT FOR NOW. MAY COME BACK!
                 <Header title={message} /> */}
 
@@ -54,7 +54,7 @@ const AppMain = () => {
           <Row className="vh-100 row-cols-1 row-cols-sm-1 row-cols-lg-2">
             <Col className="align-self-end align-self-lg-center text-center">
               <h1 className="fw-bold squash">Welcome to CGM Stats!</h1>
-              <div className="border-bottom mx-5"></div>
+              <div className="border-bottom border-success mx-5"></div>
               <p className="expand pt-2">
                 The one stop shop for all of your self-monitoring needs.
               </p>
@@ -68,11 +68,12 @@ const AppMain = () => {
     );
   } else if (dexcomConnected !== true) {
     return (
-      <>
-        {/*<Header title={message} />*/}
+      <div className="bg-success-subtle">
         <Container className="vh-100 d-flex justify-content-center align-items-center overflow-visible">
           <Col className="col-8 col-lg-4">
-            <h1 className="text-center border-bottom">Connect to Dexcom...</h1>
+            <h1 className="text-center border-bottom border-success">
+              Connect to Dexcom...
+            </h1>
             <p className="text-center">
               Logging in to Dexcom via CGM Stats does not grant CGM Stats or its
               authors visibility of your Dexcom account login information. We
@@ -90,7 +91,7 @@ const AppMain = () => {
             </Row>
           </Col>
         </Container>
-      </>
+      </div>
     );
   } else {
     return (
