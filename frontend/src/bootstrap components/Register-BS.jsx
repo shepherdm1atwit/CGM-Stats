@@ -107,7 +107,7 @@ const Register = () => {
         <ErrorMessage message={errorMessage} color="red" />
         {successMessage && <Alert variant="primary">{successMessage}</Alert>}
 
-        <Button variant="primary" type="submit" className="w-100 btn-lg">
+        <Button variant="success" type="submit" className="w-100 btn-lg">
           Register
         </Button>
       </Form>

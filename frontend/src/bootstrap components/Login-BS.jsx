@@ -70,7 +70,7 @@ const Login = () => {
           </FloatingLabel>
         </Form.Group>
         <ErrorMessage message={errorMessage} />
-        <Button variant="primary" type="submit" className="w-100 btn-lg">
+        <Button variant="success" type="submit" className="w-100 btn-lg">
           Login
         </Button>
       </Form>

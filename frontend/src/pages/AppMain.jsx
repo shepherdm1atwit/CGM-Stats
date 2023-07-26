@@ -10,6 +10,7 @@ import { Col, Modal, Row } from "react-bootstrap";
 import { User } from "react-feather";
 import "../custom.scss";
 import GraphModalMain from "../bootstrap components/GraphModalMain-BS";
+import DexcomWarningModalBS from "../bootstrap components/DexcomWarningModal-BS";
 
 const AppMain = () => {
   const [message, setMessage] = useState("");
@@ -39,13 +40,6 @@ const AppMain = () => {
     getWelcomeMessage();
   }, []);
 
-  {
-    /* below are used for the warning modal shown before connecting to dexcom */
-  }
-  const [show, setShow] = useState(false);
-  const handleCloseWarningModal = () => setShow(false);
-  const handleShowWarningModal = () => setShow(true);
-
   const goBack = () => {
     setToken("null");
   };
@@ -73,12 +67,6 @@ const AppMain = () => {
       </div>
     );
   } else if (dexcomConnected !== true) {
-    let host = window.location.origin;
-    let dexurl =
-      "https://sandbox-api.dexcom.com/v2/oauth2/login?client_id=FzbQyNRMDTm8xdRrcR2STg8I7S781RC0&redirect_uri=" +
-      host +
-      "/VerifyDexcom/&response_type=code&scope=offline_access";
-
     return (
       <>
         {/*<Header title={message} />*/}
@@ -93,29 +81,9 @@ const AppMain = () => {
               <br /> That's it!
             </p>
             <Row>
-              <Button variant="primary" onClick={handleShowWarningModal}>
-                Connect CGM Stats to Dexcom!
-              </Button>
-              <Modal show={show} onHide={handleCloseWarningModal}>
-                <Modal.Header closeButton>
-                  <Modal.Title className="">Before you go...</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  To connect to Dexcom, you will automatically be briefly taken
-                  away from, and returned to CGM Stats.
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button
-                    variant="primary"
-                    href={dexurl}
-                    onClick={handleCloseWarningModal}
-                  >
-                    Understood. Connect me!
-                  </Button>
-                </Modal.Footer>
-              </Modal>
+              <DexcomWarningModalBS />
             </Row>
-            <Row className="justify-content-center col-3 mt-3">
+            <Row className="col-3 mt-3 mx-auto">
               <Button onClick={goBack} variant="outline-secondary" className="">
                 Go Back
               </Button>
@@ -134,7 +102,7 @@ const AppMain = () => {
           </Container>
           <Container className="row">
             <div className="text-center mt-4 mb-4">
-              <h2>Explore more graphs here</h2>
+              <h2>Explore more graphs here:</h2>
             </div>
             <GraphModal />
           </Container>
