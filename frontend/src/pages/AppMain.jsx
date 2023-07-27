@@ -3,6 +3,7 @@ import { UserContext } from "../context/UserContext";
 import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
 import NavBar from "../bootstrap components/NavBar-BS";
+import SideBar from "../bootstrap components/Sidebar";
 import GraphModal from "../bootstrap components/GraphModal-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
@@ -96,6 +97,7 @@ const AppMain = () => {
   } else {
     return (
       <>
+        <div className="bg-success-subtle">
         <NavBar />
         <Container className="justify-content-center">
           <Container className="row">
@@ -108,6 +110,7 @@ const AppMain = () => {
             <GraphModal />
           </Container>
         </Container>
+        </div>
       </>
     );
   }

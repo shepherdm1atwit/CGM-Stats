@@ -1,5 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+import Card from "react-bootstrap/Card";
 import {
   ArrowDownRight,
   ArrowDown,
@@ -7,7 +10,6 @@ import {
   ArrowUp,
   ArrowUpRight,
 } from "react-feather";
-import Card from "react-bootstrap/Card";
 
 const CurrentGlucoseLevel = () => {
   const { authToken } = useContext(UserContext);
@@ -31,7 +33,6 @@ const CurrentGlucoseLevel = () => {
           setSessionExpired(true);
           setToken("null");
         }
-        //console.log(data.detail);
       } else {
         const currentGlucoseValue = data.value;
         setCurrentGlucose(currentGlucoseValue);
@@ -43,84 +44,60 @@ const CurrentGlucoseLevel = () => {
   }, []);
 
   let arrowIcon = null;
-  let arrowColor = null;
 
   switch (currentTrend) {
     case "doubleUp":
-      arrowIcon = <ArrowUpRight size={40} strokeWidth="1" />;
-      arrowColor = "red";
+      arrowIcon = <ArrowUpRight size="32" strokeWidth="1" />;
       break;
     case "singleUp":
-      arrowIcon = <ArrowUp size={40} strokeWidth="1" />;
-      arrowColor = "orange";
+      arrowIcon = <ArrowUp size="32" strokeWidth="1" />;
       break;
     case "fortyFiveUp":
-      arrowIcon = <ArrowUpRight size={40} strokeWidth="1" />;
-      arrowColor = "#FFD700";
+      arrowIcon = <ArrowUpRight size="32" strokeWidth="1" />;
       break;
     case "flat":
-      arrowIcon = <ArrowRight size={40} strokeWidth="1" />;
-      arrowColor = "lightgreen";
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
       break;
     case "fortyFiveDown":
-      arrowIcon = <ArrowDownRight size={40} strokeWidth="1" />;
-      arrowColor = "#FFD700";
+      arrowIcon = <ArrowDownRight size="32" strokeWidth="1" />;
       break;
     case "singleDown":
-      arrowIcon = <ArrowDown size={40} strokeWidth="1" />;
-      arrowColor = "orange";
+      arrowIcon = <ArrowDown size="32" strokeWidth="1" />;
       break;
     case "doubleDown":
-      arrowIcon = <ArrowDownRight size={40} strokeWidth="1" />;
-      arrowColor = "red";
-      break;
-    case "notComputable":
-      arrowIcon = <ArrowRight size={40} strokeWidth="1" />;
-      arrowColor = "grey";
-      break;
-    case "rateOutOfRange":
-      arrowIcon = <ArrowRight size={40} strokeWidth="1" />;
-      arrowColor = "grey";
+      arrowIcon = <ArrowDownRight size="32" strokeWidth="1" />;
       break;
     default:
-      arrowIcon = <ArrowRight size={40} strokeWidth="1" />;
-      arrowColor = "grey";
+      arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
   }
+
+  const getProgressBarColor = (glucoseLevel) => {
+    if(glucoseLevel <= 70) return '#ff5722';
+    if(glucoseLevel >= 180) return '#fbc02d';
+    return '#4caf50';
+  };
 
   return (
     <Card>
       <h2 className="m-0" align="center">
         Most Recent EGV
       </h2>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100px",
-            height: "100px",
-            borderRadius: "50%",
-            backgroundColor: "#4caf50",
-            color: "white",
-            fontWeight: "bold",
-            fontSize: "2rem",
-            marginRight: "1rem",
-            margin: "1rem",
-          }}
-        >
-          <div>{currentGlucose}</div>
-          <div style={{ fontSize: "0.8rem" }}>mg/dl</div>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '1rem' }}>
+        <div style={{ width: 100, height: 100, marginRight: '1rem' }}>
+          <CircularProgressbar
+            value={currentGlucose}
+            text={`${currentGlucose} mg/dL`}
+            maxValue={400}
+            styles={buildStyles({
+              strokeLinecap: 'butt',
+              textSize: '16px',
+              pathColor: getProgressBarColor(currentGlucose),
+              textColor: '#000',
+              trailColor: '#ddd',
+            })}
+          />
         </div>
-        {arrowIcon && <span style={{ color: arrowColor }}>{arrowIcon}</span>}
+        {arrowIcon}
       </div>
     </Card>
   );

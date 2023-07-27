@@ -1,20 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import {
-  VictoryChart,
-  VictoryLine,
-  VictoryTheme,
-  VictoryAxis,
-  VictoryLabel,
-  VictoryArea,
-} from "victory";
+import Plot from 'react-plotly.js';
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 
 const PastDayGraph = () => {
   const { authToken, userPrefs, sessionExp } = useContext(UserContext);
-  const [, setSessionExpired] = sessionExp;
   const [token, setToken] = authToken;
+  const [, setSessionExpired] = sessionExp;
   const [graphData, setGraphData] = useState([]);
   const [isActive] = useState(true);
   const [prefs] = userPrefs;
@@ -35,7 +28,6 @@ const PastDayGraph = () => {
           setSessionExpired(true);
           setToken("null");
         }
-        //console.log(data.detail);
       } else {
         setGraphData(data.xy_pairs);
       }
@@ -59,69 +51,62 @@ const PastDayGraph = () => {
   const maxPref = prefs.maximum !== null ? parseInt(prefs.maximum) : null;
   const minPref = prefs.minimum !== null ? parseInt(prefs.minimum) : null;
 
+  let xValues = graphData.map(pair => formatTick(pair.x));
+  let yValues = graphData.map(pair => pair.y);
+
+  let plotData = [
+    {
+      x: xValues,
+      y: yValues,
+      type: 'scatter',
+      mode: 'lines',
+      name: 'Past Day',
+      line: { color: '#058705' },
+    },
+  ];
+
   if (maxPref != null && minPref != null) {
-    return (
-      <Card>
-        <Card.Text className="justify-content-center">
-          <h2 className="mb-3" align="center">
-            Past Day
-          </h2>
-        </Card.Text>
-        <VictoryChart
-          theme={VictoryTheme.material}
-          width={300}
-          height={150}
-          padding={{ bottom: 25, left: 40, right: 40 }}
-        >
-          <VictoryLine
-            style={{
-              data: { stroke: "#058705" },
-              parent: { border: "1px solid #ccc" },
-            }}
-            data={graphData}
-          />
-
-          <VictoryLine
-            style={{ data: { stroke: "rgba(46,234,99,0.5)", strokeWidth: 0 } }}
-            y={() => maxPref}
-            domain={{ y: [minPref, maxPref] }}
-          />
-          <VictoryArea
-            style={{ data: { fill: "green", fillOpacity: 0.2 } }}
-            y0={() => minPref}
-            y={() => maxPref}
-            domain={{ y: [minPref, maxPref] }}
-          />
-
-          <VictoryAxis
-            tickFormat={(x) => formatTick(x)}
-            style={{ tickLabels: { fontSize: 6, angle: 60 } }}
-          />
-          <VictoryAxis dependentAxis />
-        </VictoryChart>
-      </Card>
-    );
-  } else {
-    return (
-      <Container className="d-flex justify-content-center">
-        <VictoryChart theme={VictoryTheme.material} width={300} height={200}>
-          <VictoryLabel x={150} y={20} text="Past Day" textAnchor="middle" />
-          <VictoryLine
-            style={{
-              data: { stroke: "#058705" },
-              parent: { border: "1px solid #ccc" },
-            }}
-            data={graphData}
-          />
-          <VictoryAxis
-            tickFormat={(x) => formatTick(x)}
-            style={{ tickLabels: { fontSize: 6, angle: 60 } }}
-          />
-          <VictoryAxis dependentAxis />
-        </VictoryChart>
-      </Container>
+    plotData.push(
+      {
+        x: [xValues[0], xValues[xValues.length - 1]],
+        y: [minPref, minPref],
+        mode: 'lines',
+        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        showlegend: false,
+      },
+      {
+        x: [xValues[0], xValues[xValues.length - 1]],
+        y: [maxPref, maxPref],
+        mode: 'lines',
+        fill: 'tonexty',
+        fillcolor: 'rgba(46,234,99,0.2)',
+        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        showlegend: false,
+      },
     );
   }
+
+  let layout = {
+    title: 'Past Day',
+    xaxis: {
+      title: 'Date',
+      tickangle: 45,
+    },
+    yaxis: {
+      title: 'Preference Range',
+    },
+  };
+
+  return (
+    <Card>
+      <Card.Text className="justify-content-center">
+        <h2 className="mb-3" align="center">
+          Past Day
+        </h2>
+      </Card.Text>
+      <Plot data={plotData} layout={layout} />
+    </Card>
+  );
 };
 
 export default PastDayGraph;
