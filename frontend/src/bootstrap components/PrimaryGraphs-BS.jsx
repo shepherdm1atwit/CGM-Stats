@@ -3,6 +3,7 @@ import { Modal } from "react-bootstrap";
 import CurrentGlucoseLevel from "./CurrentGlucoseLevel-BS";
 import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
+import BoxPlot from "./BoxPlot-BS";
 
 const graphs = [<CurrentGlucoseLevel />, <PastDayGraph />];
 
