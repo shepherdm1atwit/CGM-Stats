@@ -97,6 +97,8 @@ const PastDayGraph = () => {
     },
   };
 
+  let config = { responsive: true };
+
   return (
     <Card>
       <Card.Text className="justify-content-center">
@@ -104,7 +106,7 @@ const PastDayGraph = () => {
           Past Day
         </h2>
       </Card.Text>
-      <Plot data={plotData} layout={layout} />
+      <Plot data={plotData} layout={layout} config={config} />
     </Card>
   );
 };
