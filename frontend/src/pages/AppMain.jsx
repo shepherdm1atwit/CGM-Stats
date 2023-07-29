@@ -4,13 +4,13 @@ import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
 import NavBar from "../bootstrap components/NavBar-BS";
 import SideBar from "../bootstrap components/Sidebar";
-import GraphModal from "../bootstrap components/GraphModal-BS";
+import GraphCarousel from "../bootstrap components/GraphCarousel-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import { Col, Modal, Row } from "react-bootstrap";
 import { User } from "react-feather";
 import "../custom.scss";
-import GraphModalMain from "../bootstrap components/GraphModalMain-BS";
+import PrimaryGraphs from "../bootstrap components/PrimaryGraphs-BS";
 import DexcomWarningModalBS from "../bootstrap components/DexcomWarningModal-BS";
 
 const AppMain = () => {
@@ -101,13 +101,13 @@ const AppMain = () => {
         <div className="bg-success-subtle">
           <Container className="justify-content-center pt-6">
             <Container className="row">
-              <GraphModalMain />
+              <PrimaryGraphs />
             </Container>
-            <Container className="row">
-              <div className="text-center mt-4 mb-4">
-                <h2>Explore more graphs here:</h2>
+            <Container className="row pb-5">
+              <div className="text-center mt-4 mb-4 ">
+                <h2>More Graphs:</h2>
               </div>
-              <GraphModal />
+              <GraphCarousel />
             </Container>
           </Container>
         </div>

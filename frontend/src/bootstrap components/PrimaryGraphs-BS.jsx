@@ -6,7 +6,7 @@ import BestDayGraph from "./BestDayGraph-BS";
 
 const graphs = [<CurrentGlucoseLevel />, <PastDayGraph />];
 
-const GraphModalMain = () => {
+const PrimaryGraphs = () => {
   return (
     <>
       <div
@@ -23,4 +23,4 @@ const GraphModalMain = () => {
   );
 };
 
-export default GraphModalMain;
+export default PrimaryGraphs;

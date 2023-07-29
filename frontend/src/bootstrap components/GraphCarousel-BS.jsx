@@ -7,12 +7,7 @@ import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
 import PieChart from "./PieChart-BS";
 
-const graphs = [
-  <CurrentGlucoseLevel />,
-  <PastDayGraph />,
-  <BestDayGraph />,
-  <PieChart />,
-];
+const graphs = [<PastDayGraph />, <BestDayGraph />, <PieChart />];
 
 const responsive = {
   desktop: {
@@ -32,7 +27,7 @@ const responsive = {
   },
 };
 
-const GraphModal = () => {
+const GraphCarousel = () => {
   const [selectedGraph, setSelectedGraph] = useState(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -70,17 +65,13 @@ const GraphModal = () => {
         ))}
       </Carousel>
       {selectedGraph && (
-        <Modal
-          className="overflow-visible"
-          show={isActive}
-          onHide={handleClose}
-        >
+        <Modal show={isActive} onHide={handleClose}>
           <Modal.Header closeButton />
-          <Modal.Body>{selectedGraph}</Modal.Body>
+          <Modal.Body className="modal-content">{selectedGraph}</Modal.Body>
         </Modal>
       )}
     </>
   );
 };
 
-export default GraphModal;
+export default GraphCarousel;

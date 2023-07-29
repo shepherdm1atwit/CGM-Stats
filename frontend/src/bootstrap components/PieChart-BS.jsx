@@ -33,7 +33,7 @@ const PieChart = () => {
   }, []);
 
   if (chartValues.length === 0) {
-    return <div>Please enter preferences to use this component</div>;
+    return <div>Please enter preferences to view this graph.</div>;
   } else {
     const data = [
       {
@@ -46,8 +46,13 @@ const PieChart = () => {
         type: "pie",
       },
     ];
+
+    let layout = {
+      title: "Blood Glucose over Last 24 hours",
+    };
+
     let config = { responsive: true };
-    return <Plotly data={data} config={config} />;
+    return <Plotly data={data} layout={layout} config={config} />;
   }
 };
 

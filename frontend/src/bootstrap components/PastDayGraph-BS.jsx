@@ -86,16 +86,16 @@ const PastDayGraph = () => {
     );
   }
 
-let layout = {
-  xaxis: {
-    title: "Time of Reading", // x-axis title
-    tickangle: 45,
-  },
-  yaxis: {
-    title: "Blood Glucose Level", // y-axis title
-  },
-  showlegend: false, // This line will hide the legend
-};
+  let layout = {
+    xaxis: {
+      title: "Time of Reading", // x-axis title
+      tickangle: 45,
+    },
+    yaxis: {
+      title: "Blood Glucose Level", // y-axis title
+    },
+    showlegend: false, // This line will hide the legend
+  };
 
   let config = { responsive: true };
 

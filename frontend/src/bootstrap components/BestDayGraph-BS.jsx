@@ -63,7 +63,7 @@ const BestDayGraph = () => {
       x: xValues,
       y: yValues,
       type: "scatter",
-      mode: "lines",
+      mode: "lines+markers",
       name: "Best Day",
       line: { color: "#07cccc" },
     },
@@ -105,18 +105,20 @@ const BestDayGraph = () => {
 
   return (
     <Card>
-      <Card.Text className="justify-content-center">
-        <h2 className="m-0" align="center">
-          Best Day
-        </h2>
-        <p className="m-0" style={{ textAlign: "center" }}>
-          Best day: <strong>{bestDay}</strong>
-        </p>
-        <p className="m-0" style={{ textAlign: "center" }}>
-          Best day standard deviation: <strong>{bestDayStd}</strong>
-        </p>
-      </Card.Text>
-      <Plot data={plotData} layout={layout} config={config} />
+      <Card.Body>
+        <Card.Title align="center">
+          <h2>Best Day</h2>
+        </Card.Title>
+        <Card.Text className="justify-content-center">
+          <p className="m-0" style={{ textAlign: "center" }}>
+            Best day: <strong>{bestDay}</strong>
+          </p>
+          <p className="m-0" style={{ textAlign: "center" }}>
+            Best day standard deviation: <strong>{bestDayStd}</strong>
+          </p>
+          <Plot data={plotData} layout={layout} config={config} />
+        </Card.Text>
+      </Card.Body>
     </Card>
   );
 };
