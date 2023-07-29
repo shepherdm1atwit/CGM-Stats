@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import Plotly from "react-plotly.js";
+import Plot from "react-plotly.js";
 
 const BoxPlot = () => {
   const { authToken, sessionExp } = useContext(UserContext);
@@ -10,7 +10,7 @@ const BoxPlot = () => {
   const [plotLabels, setPlotLabels] = useState([]);
 
   useEffect(() => {
-    const getPastDayPie = async () => {
+    const getPastWeekBoxPlot = async () => {
       const requestOptions = {
         method: "GET",
         headers: {
@@ -31,10 +31,8 @@ const BoxPlot = () => {
       }
     };
     getPastWeekBoxPlot();
-  }, []);
+  }, [token, setSessionExpired, setToken]);
 
-
-  //TODO: unsure how to get values into boxplot, but data should be there
   let data = [];
   for (let i = 0; i < plotValues.length; i++) {
     let day = {
@@ -48,7 +46,7 @@ const BoxPlot = () => {
     title: "Glucose range by day in past week",
   };
 
-  return <Plotly data={data} />;
+  return <Plot data={data} layout={layout} />;
 };
 
 export default BoxPlot;
