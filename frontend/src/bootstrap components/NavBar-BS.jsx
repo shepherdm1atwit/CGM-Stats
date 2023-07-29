@@ -1,26 +1,25 @@
 import React, { useState } from "react";
 import LogoutButton from "./LogoutButton-BS";
 import SettingsModal from "./SettingsModal-BS";
-import {Navbar, Container} from "react-bootstrap";
+import { Navbar, Container } from "react-bootstrap";
+import Logo from "../CGM_Logo.png";
 
 const NavBar = () => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   function toggleBurgerMenu() {
-    document.querySelector('.navbar-menu').classList.toggle('is-active')
+    document.querySelector(".navbar-menu").classList.toggle("is-active");
   }
 
   return (
-    <Navbar>
+    <Navbar bg="success" className="position-sticky top-0">
       <Container>
-        <Navbar.Brand href="\">CGM Stats</Navbar.Brand>
-          <SettingsModal />
-        <Navbar.Collapse className="justify-content-end">
-          <LogoutButton />
-        </Navbar.Collapse>
+        <Navbar.Brand href="#">
+          <img src={Logo} width="200" height="125" />
+        </Navbar.Brand>
+        <SettingsModal />
       </Container>
     </Navbar>
-
   );
 };
 

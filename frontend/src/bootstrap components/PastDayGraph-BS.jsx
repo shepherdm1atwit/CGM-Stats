@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import Plot from 'react-plotly.js';
+import Plot from "react-plotly.js";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 
@@ -51,17 +51,17 @@ const PastDayGraph = () => {
   const maxPref = prefs.maximum !== null ? parseInt(prefs.maximum) : null;
   const minPref = prefs.minimum !== null ? parseInt(prefs.minimum) : null;
 
-  let xValues = graphData.map(pair => formatTick(pair.x));
-  let yValues = graphData.map(pair => pair.y);
+  let xValues = graphData.map((pair) => formatTick(pair.x));
+  let yValues = graphData.map((pair) => pair.y);
 
   let plotData = [
     {
       x: xValues,
       y: yValues,
-      type: 'scatter',
-      mode: 'lines',
-      name: 'Past Day',
-      line: { color: '#058705' },
+      type: "scatter",
+      mode: "lines",
+      name: "Past Day",
+      line: { color: "#058705" },
     },
   ];
 
@@ -70,30 +70,30 @@ const PastDayGraph = () => {
       {
         x: [xValues[0], xValues[xValues.length - 1]],
         y: [minPref, minPref],
-        mode: 'lines',
-        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        mode: "lines",
+        line: { color: "rgba(46,234,99,0.5)", width: 0 },
         showlegend: false,
       },
       {
         x: [xValues[0], xValues[xValues.length - 1]],
         y: [maxPref, maxPref],
-        mode: 'lines',
-        fill: 'tonexty',
-        fillcolor: 'rgba(46,234,99,0.2)',
-        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        mode: "lines",
+        fill: "tonexty",
+        fillcolor: "rgba(46,234,99,0.2)",
+        line: { color: "rgba(46,234,99,0.5)", width: 0 },
         showlegend: false,
-      },
+      }
     );
   }
 
   let layout = {
-    title: 'Past Day',
+    title: "Past Day",
     xaxis: {
-      title: 'Date',
+      title: "Date",
       tickangle: 45,
     },
     yaxis: {
-      title: 'Preference Range',
+      title: "Preference Range",
     },
   };
 

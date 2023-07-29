@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import ErrorMessage from "../components/ErrorMessage";
 import { UserContext } from "../context/UserContext";
+import LogoutButtonBS from "./LogoutButton-BS";
+import { Log } from "victory";
 
 const SettingsModal = () => {
   const { authToken, userPrefs, dexConnect, sessionExp } =
@@ -99,9 +101,13 @@ const SettingsModal = () => {
 
   return (
     <>
-      <a className="navbar-item" onClick={handleShow}>
+      <Button
+        variant="outline-light"
+        className="navbar-item"
+        onClick={handleShow}
+      >
         Settings
-      </a>
+      </Button>
       <Modal className="modal-lg" show={isActive} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Settings</Modal.Title>
@@ -138,12 +144,13 @@ const SettingsModal = () => {
           <Button variant="primary" type="submit" onClick={handleSubmit}>
             Save Changes
           </Button>
-          <Button variant="danger" onClick={deletePreferences}>
-            Clear Preferences
-          </Button>
           <Button variant="warning" onClick={handleDisconnect}>
             Disconnect Dexcom Account
           </Button>
+          <Button variant="danger" onClick={deletePreferences}>
+            Clear Preferences
+          </Button>
+          <LogoutButtonBS />
         </Modal.Footer>
       </Modal>
     </>

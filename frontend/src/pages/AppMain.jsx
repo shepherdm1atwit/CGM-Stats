@@ -97,19 +97,19 @@ const AppMain = () => {
   } else {
     return (
       <>
-        <div className="bg-success-subtle">
         <NavBar />
-        <Container className="justify-content-center">
-          <Container className="row">
-            <GraphModalMain />
+        <div className="bg-success-subtle">
+          <Container className="justify-content-center pt-6">
+            <Container className="row">
+              <GraphModalMain />
+            </Container>
+            <Container className="row">
+              <div className="text-center mt-4 mb-4">
+                <h2>Explore more graphs here:</h2>
+              </div>
+              <GraphModal />
+            </Container>
           </Container>
-          <Container className="row">
-            <div className="text-center mt-4 mb-4">
-              <h2>Explore more graphs here:</h2>
-            </div>
-            <GraphModal />
-          </Container>
-        </Container>
         </div>
       </>
     );

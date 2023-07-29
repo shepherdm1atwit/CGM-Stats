@@ -27,7 +27,7 @@ const GraphModalMain = () => {
       >
         {graphs.map((graph, index) => (
           <div
-            className="graph"
+            className="graph pt-3"
             key={index}
             onClick={() => handleGraphClick(graph)}
           >
