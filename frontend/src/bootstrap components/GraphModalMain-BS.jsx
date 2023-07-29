@@ -5,7 +5,7 @@ import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
 import BoxPlot from "./BoxPlot-BS";
 
-const graphs = [<CurrentGlucoseLevel />, <BoxPlot />];
+const graphs = [<CurrentGlucoseLevel />, <PastDayGraph />];
 
 const GraphModalMain = () => {
   return (
