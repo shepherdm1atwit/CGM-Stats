@@ -91,14 +91,14 @@ const BestDayGraph = () => {
   }
 
   let layout = {
-    title: "Best Day",
     xaxis: {
-      title: "Date",
+      title: "Time of Reading",
       tickangle: 45,
     },
     yaxis: {
-      title: "Preference Range",
+      title: "Blood Glucose Level",
     },
+    showlegend: false, // This line will hide the legend
   };
 
   let config = { responsive: true };

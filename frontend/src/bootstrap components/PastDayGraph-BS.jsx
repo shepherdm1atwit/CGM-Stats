@@ -60,7 +60,7 @@ const PastDayGraph = () => {
       y: yValues,
       type: "scatter",
       mode: "lines",
-      name: "Past Day",
+      name: "Desired Range",
       line: { color: "#058705" },
     },
   ];
@@ -86,16 +86,16 @@ const PastDayGraph = () => {
     );
   }
 
-  let layout = {
-    title: "Past Day",
-    xaxis: {
-      title: "Date",
-      tickangle: 45,
-    },
-    yaxis: {
-      title: "Preference Range",
-    },
-  };
+let layout = {
+  xaxis: {
+    title: "Time of Reading", // x-axis title
+    tickangle: 45,
+  },
+  yaxis: {
+    title: "Blood Glucose Level", // y-axis title
+  },
+  showlegend: false, // This line will hide the legend
+};
 
   let config = { responsive: true };
 
