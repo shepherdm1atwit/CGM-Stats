@@ -1,33 +1,35 @@
-import React, { useState } from 'react';
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import { Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { Modal } from "react-bootstrap";
 import CurrentGlucoseLevel from "./CurrentGlucoseLevel-BS";
 import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
+import PieChart from "./PieChart-BS";
 
 const graphs = [
-    <CurrentGlucoseLevel />,
-    <PastDayGraph />,
-    <BestDayGraph />
+  <CurrentGlucoseLevel />,
+  <PastDayGraph />,
+  <BestDayGraph />,
+  <PieChart />,
 ];
 
 const responsive = {
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
     items: 3,
-    slidesToSlide: 1 // optional, default to 1.
+    slidesToSlide: 1, // optional, default to 1.
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
     items: 2,
-    slidesToSlide: 1 // optional, default to 1.
+    slidesToSlide: 1, // optional, default to 1.
   },
   mobile: {
     breakpoint: { max: 464, min: 0 },
     items: 1,
-    slidesToSlide: 1 // optional, default to 1.
-  }
+    slidesToSlide: 1, // optional, default to 1.
+  },
 };
 
 const GraphModal = () => {
@@ -58,7 +60,11 @@ const GraphModal = () => {
         containerClass="carousel-container"
       >
         {graphs.map((graph, index) => (
-          <div className="graph" key={index} onClick={() => handleGraphClick(graph)}>
+          <div
+            className="graph"
+            key={index}
+            onClick={() => handleGraphClick(graph)}
+          >
             {graph}
           </div>
         ))}
@@ -66,9 +72,7 @@ const GraphModal = () => {
       {selectedGraph && (
         <Modal className="modal-xl" show={isActive} onHide={handleClose}>
           <Modal.Header closeButton />
-          <Modal.Body>
-            {selectedGraph}
-          </Modal.Body>
+          <Modal.Body>{selectedGraph}</Modal.Body>
         </Modal>
       )}
     </>

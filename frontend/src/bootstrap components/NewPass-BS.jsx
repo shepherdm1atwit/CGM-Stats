@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import ErrorMessage from "./ErrorMessage-BS";
 import { useNavigate, useParams } from "react-router-dom";
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Alert from 'react-bootstrap/Alert';
-import Card from 'react-bootstrap/Card';
-import Container from 'react-bootstrap/Container';
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
+import Card from "react-bootstrap/Card";
+import Container from "react-bootstrap/Container";
 
 const NewPass = () => {
   const navigate = useNavigate();
@@ -15,7 +15,42 @@ const NewPass = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ...
+  const submitPassChange = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: resetCode, password: password }),
+    };
+
+    try {
+      const response = await fetch("/api/resetpassword", requestOptions);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMessage(data.detail);
+      } else {
+        setSuccessMessage("Password changed successfully.");
+        setErrorMessage("");
+        navigate("/");
+      }
+    } catch (error) {
+      setErrorMessage("An error occurred while changing password.");
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (password === confirmationPassword && password.length > 5) {
+      submitPassChange();
+    } else {
+      if (password.length <= 5) {
+        setErrorMessage("Password must be at least 6 characters long");
+      } else {
+        setErrorMessage("Password and confirmation password do not match");
+      }
+      setSuccessMessage("");
+    }
+  };
 
   return (
     <Container className="d-flex justify-content-center">

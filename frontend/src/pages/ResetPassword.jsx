@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../components/Header";
-import NewPass from "../components/NewPass";
+import NewPass from "../bootstrap components/NewPass-BS";
 
 const ResetPassword = () => {
   return (

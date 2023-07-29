@@ -40,6 +40,7 @@ async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends
 
     return await services.create_jwt_token(user)
 
+
 @app.get("/me")
 async def get_user(user: schemas.User = Depends(services.get_current_user)):
     return user
@@ -326,3 +327,58 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
 
     xy_pairs.reverse()
     return {"best_day": best_day.isoformat(), "best_day_std": lowest_std, "xy_pairs": xy_pairs}
+
+
+@app.get('/getpastdaypie')
+async def get_past_day_egvs(request: Request, user: schemas.User = Depends(services.get_current_user),
+                            db: Session = Depends(services.get_db)):
+    db_user = db.query(dbUser).get(user.id)
+    pref_min = db_user.pref_gluc_min
+    pref_max = db_user.pref_gluc_max
+
+    if pref_min is None or pref_max is None:
+        return {"values": []}
+
+    access_token = db_user.dex_access_token
+    end_time = datetime.datetime.now()
+    start_time = end_time - datetime.timedelta(hours=24)
+
+    url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
+
+    query = {
+        "startDate": start_time.isoformat(),
+        "endDate": end_time.isoformat()
+    }
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = requests.get(url, headers=headers, params=query)
+    data = response.json()
+    if "fault" in data:
+        await services.refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
+        db.refresh(db_user)
+        access_token = db_user.dex_access_token
+        headers["Authorization"] = f"Bearer {access_token}"
+
+        response = requests.get(url, headers=headers, params=query)
+        data = response.json()
+
+    records = data["records"]
+
+    if len(records) == 0:
+        raise HTTPException(status_code=500, detail="no records found")
+
+    num_above = 0
+    num_below = 0
+    num_in_range = 0
+    for record in records:
+        if int(record["value"]) > int(pref_max):
+            num_above += 1
+        elif int(record["value"]) < int(pref_min):
+            num_below += 1
+        else:
+            num_in_range += 1
+
+    values = [((num_in_range / len(records)) * 100).__round__(), ((num_above / len(records)) * 100).__round__(),
+              ((num_below / len(records)) * 100).__round__()]
+    return {"values": values}
