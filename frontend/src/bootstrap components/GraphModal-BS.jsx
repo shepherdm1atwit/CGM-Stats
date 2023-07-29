@@ -70,7 +70,11 @@ const GraphModal = () => {
         ))}
       </Carousel>
       {selectedGraph && (
-        <Modal className="modal-xl" show={isActive} onHide={handleClose}>
+        <Modal
+          className="overflow-visible"
+          show={isActive}
+          onHide={handleClose}
+        >
           <Modal.Header closeButton />
           <Modal.Body>{selectedGraph}</Modal.Body>
         </Modal>

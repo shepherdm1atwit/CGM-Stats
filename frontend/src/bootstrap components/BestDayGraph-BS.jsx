@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import Plot from 'react-plotly.js';
+import Plot from "react-plotly.js";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 
@@ -55,17 +55,17 @@ const BestDayGraph = () => {
     }
   };
 
-  let xValues = graphData.map(pair => formatTick(pair.x));
-  let yValues = graphData.map(pair => pair.y);
+  let xValues = graphData.map((pair) => formatTick(pair.x));
+  let yValues = graphData.map((pair) => pair.y);
 
   let plotData = [
     {
       x: xValues,
       y: yValues,
-      type: 'scatter',
-      mode: 'lines',
-      name: 'Best Day',
-      line: { color: '#07cccc' },
+      type: "scatter",
+      mode: "lines",
+      name: "Best Day",
+      line: { color: "#07cccc" },
     },
   ];
 
@@ -74,32 +74,34 @@ const BestDayGraph = () => {
       {
         x: [xValues[0], xValues[xValues.length - 1]],
         y: [minPref, minPref],
-        mode: 'lines',
-        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        mode: "lines",
+        line: { color: "rgba(46,234,99,0.5)", width: 0 },
         showlegend: false,
       },
       {
         x: [xValues[0], xValues[xValues.length - 1]],
         y: [maxPref, maxPref],
-        mode: 'lines',
-        fill: 'tonexty',
-        fillcolor: 'rgba(46,234,99,0.2)',
-        line: { color: 'rgba(46,234,99,0.5)', width: 0 },
+        mode: "lines",
+        fill: "tonexty",
+        fillcolor: "rgba(46,234,99,0.2)",
+        line: { color: "rgba(46,234,99,0.5)", width: 0 },
         showlegend: false,
-      },
+      }
     );
   }
 
   let layout = {
-    title: 'Best Day',
     xaxis: {
-      title: 'Date',
+      title: "Time of Reading",
       tickangle: 45,
     },
     yaxis: {
-      title: 'Preference Range',
+      title: "Blood Glucose Level",
     },
+    showlegend: false, // This line will hide the legend
   };
+
+  let config = { responsive: true };
 
   return (
     <Card>
@@ -114,7 +116,7 @@ const BestDayGraph = () => {
           Best day standard deviation: <strong>{bestDayStd}</strong>
         </p>
       </Card.Text>
-      <Plot data={plotData} layout={layout} />
+      <Plot data={plotData} layout={layout} config={config} />
     </Card>
   );
 };

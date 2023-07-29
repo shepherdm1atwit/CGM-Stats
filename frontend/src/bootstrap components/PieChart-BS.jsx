@@ -46,8 +46,8 @@ const PieChart = () => {
         type: "pie",
       },
     ];
-
-    return <Plotly data={data} />;
+    let config = { responsive: true };
+    return <Plotly data={data} config={config} />;
   }
 };
 
