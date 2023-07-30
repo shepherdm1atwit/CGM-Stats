@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import { Modal } from "react-bootstrap";
-import CurrentGlucoseLevel from "./CurrentGlucoseLevel-BS";
 import PastDayGraph from "./PastDayGraph-BS";
 import BestDayGraph from "./BestDayGraph-BS";
 import PieChart from "./PieChart-BS";
+import BoxPlot from "./BoxPlot-BS";
 
-const graphs = [<PastDayGraph />, <BestDayGraph />, <PieChart />];
+const graphs = [<PastDayGraph />, <BestDayGraph />, <PieChart />, <BoxPlot />];
 
 const responsive = {
   desktop: {

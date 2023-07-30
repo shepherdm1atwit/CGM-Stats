@@ -390,7 +390,7 @@ async def get_box_plot(request: Request, user: schemas.User = Depends(services.g
                        db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now() - datetime.timedelta(days=1)
+    end_time = datetime.datetime.now()
     start_time = end_time - datetime.timedelta(days=7)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
@@ -422,7 +422,7 @@ async def get_box_plot(request: Request, user: schemas.User = Depends(services.g
     val_by_day = [[], [], [], [], [], [], []]
     days = []
     current_date = start_time.date()
-    days.append(current_date.weekday())
+    days.append(calendar.day_name[current_date.weekday()])
     current_day_num = 0
     for record in records:
         record_date = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ').date()
@@ -432,7 +432,9 @@ async def get_box_plot(request: Request, user: schemas.User = Depends(services.g
         else:
             current_date = record_date
             current_day_num += 1
+            if current_day_num == 7:
+                break
             val_by_day[current_day_num].append(record["value"])
-            days.append(current_date.weekday())
+            days.append(calendar.day_name[current_date.weekday()])
 
     return {"values": val_by_day, "days": days}
