@@ -3,6 +3,7 @@ import { UserContext } from "../context/UserContext";
 import Plot from "react-plotly.js";
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
+import "../custom.scss";
 
 const BestDayGraph = () => {
   const { authToken, userPrefs, sessionExp } = useContext(UserContext);
@@ -103,24 +104,23 @@ const BestDayGraph = () => {
 
   let config = { responsive: true };
 
-  return (
-    <Card>
-      <Card.Body>
-        <Card.Title align="center">
-          <h2>Best Day</h2>
-        </Card.Title>
-        <Card.Text className="justify-content-center">
-          <p className="m-0" style={{ textAlign: "center" }}>
-            Best day: <strong>{bestDay}</strong>
-          </p>
-          <p className="m-0" style={{ textAlign: "center" }}>
-            Best day standard deviation: <strong>{bestDayStd}</strong>
-          </p>
-          <Plot data={plotData} layout={layout} config={config} />
-        </Card.Text>
-      </Card.Body>
-    </Card>
-  );
+return (
+  <Card>
+    <Card.Text className="justify-content-center">
+      <h2 className="mb-3" align="center">
+        Best Day
+      </h2>
+      <p className="m-0" style={{ textAlign: "center" }}>
+        Best day: <strong>{bestDay}</strong>
+      </p>
+      <p className="m-0" style={{ textAlign: "center" }}>
+        Best day standard deviation: <strong>{bestDayStd}</strong>
+      </p>
+    </Card.Text>
+    <Plot data={plotData} layout={layout} config={config} />
+  </Card>
+);
+
 };
 
 export default BestDayGraph;
