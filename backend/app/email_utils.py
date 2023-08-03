@@ -4,20 +4,20 @@ from pydantic import EmailStr, BaseModel
 from config import settings
 from typing import List
 
+""" Specify variables for using html templates. """
 env = Environment(
     loader=FileSystemLoader(searchpath="./templates"),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
 
-class EmailSchema(BaseModel):
-    email: List[EmailStr]
-
-
 class Email:
+    """
+    Email object, used to create emails customized for specific users using HTML templates.
+    """
+
     def __init__(self, user: dict, url: str, email: List[EmailStr]):
         self.name = user['name']
-        self.sender = 'CGM Stats <mailbot1248@gmail.com>'  # TODO: change this address to a real email
         self.email = email
         self.url = url
         pass
@@ -57,7 +57,13 @@ class Email:
         await fm.send_message(message)
 
     async def sendVerificationCode(self):
+        """
+        Sends account/email verification email by calling sendMail with the correct subject and template
+        """
         await self.sendMail('CGMStats: Verify your email', 'verification')
 
     async def sendResetCode(self):
+        """
+        Sends password reset verification email by calling sendMail with the correct subject and template
+        """
         await self.sendMail('CGMStats: Your password reset link', 'password_reset')

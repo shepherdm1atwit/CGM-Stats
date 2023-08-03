@@ -12,6 +12,8 @@ from statistics import pstdev
 app = FastAPI()
 
 
+# TODO: DOCUMENTATION HERE (whole file)
+
 @app.get("/api")
 async def root():
     return {"message": "CGM Stats"}

@@ -2,6 +2,10 @@ from pydantic import BaseSettings, EmailStr
 
 
 class Settings(BaseSettings):
+    """
+    Pydantic BaseSettings object that retrieves values from specified env_file when created, then is imported elsewhere
+     as 'config.settings'.
+    """
 
     JWT_PRIVATE_KEY: str
     JWT_EXP_MINUTES: int

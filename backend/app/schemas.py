@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from pydantic.fields import Optional
 
 
+# TODO: DOCUMENTATION HERE (whole file)
 class UserBase(BaseModel):
     email: str
 
