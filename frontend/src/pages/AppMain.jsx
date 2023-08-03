@@ -1,24 +1,39 @@
+/**
+ * @file AppMain.jsx
+ * @brief Main application component for CGM Stats
+ *
+ * This file contains the main application logic and components. It controls user authentication,
+ * connection status, and component rendering based on the user's state.
+ */
+
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import Header from "../components/Header";
 import UserManage from "../bootstrap components/UserManage-BS";
 import NavBar from "../bootstrap components/NavBar-BS";
-import SideBar from "../bootstrap components/Sidebar";
 import GraphCarousel from "../bootstrap components/GraphCarousel-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import { Col, Modal, Row } from "react-bootstrap";
-import { User } from "react-feather";
 import "../custom.scss";
 import PrimaryGraphs from "../bootstrap components/PrimaryGraphs-BS";
 import DexcomWarningModalBS from "../bootstrap components/DexcomWarningModal-BS";
 
+/**
+ * @function AppMain
+ * @description Main application component
+ *
+ * Renders different sections of the application based on user's authentication and connection status.
+ */
 const AppMain = () => {
   const [message, setMessage] = useState("");
   const { authToken, dexConnect } = useContext(UserContext);
   const [token, setToken] = authToken;
   const [dexcomConnected] = dexConnect;
 
+    /**
+   * @function getWelcomeMessage
+   * @description Fetch welcome message from the server
+   */
   const getWelcomeMessage = async () => {
     const requestOptions = {
       method: "GET",
@@ -37,14 +52,20 @@ const AppMain = () => {
     }
   };
 
+  // Fetch welcome message when the component is mounted
   useEffect(() => {
     getWelcomeMessage();
   }, []);
 
+  /**
+   * @function goBack
+   * @description Reset authentication token to 'null'
+   */
   const goBack = () => {
     setToken("null");
   };
 
+  // Rendering logic based on user's authentication and connection status
   if (token === "null") {
     return (
       <div className="vh-100 bg-success-subtle">
