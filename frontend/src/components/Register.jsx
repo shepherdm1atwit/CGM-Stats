@@ -11,23 +11,27 @@ const Register = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const submitRegistration = async () => {
-  const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: email, name: name, hashed_password: password }),
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        name: name,
+        password: password,
+      }),
+    };
+
+    const response = await fetch("/api/register", requestOptions);
+    const data = await response.json();
+
+    if (response.ok) {
+      setSuccessMessage("Please check your email for verification link.");
+      setErrorMessage("");
+    } else {
+      setErrorMessage(data.detail);
+      setSuccessMessage("");
+    }
   };
-
-  const response = await fetch("/api/register", requestOptions);
-  const data = await response.json();
-
-  if (response.ok) {
-    setSuccessMessage("Please check your email for verification link.");
-    setErrorMessage("");
-  } else {
-    setErrorMessage(data.detail);
-    setSuccessMessage("");
-  }
-};
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -43,7 +47,6 @@ const Register = () => {
       }
     }
   };
-
 
   return (
     <div className="column">

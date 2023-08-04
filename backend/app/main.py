@@ -8,6 +8,7 @@ from database import User as dbUser
 import datetime
 import calendar
 from statistics import pstdev
+from passlib.hash import bcrypt
 
 app = FastAPI()
 
@@ -25,12 +26,45 @@ async def root():
 
 
 @app.post("/register")
-async def create_user(user: schemas.CreateUser, request: Request, db: Session = Depends(services.get_db)):
+async def register_user(user: schemas.CreateUser, request: Request, db: Session = Depends(services.get_db)):
+    """
+    Creates a new user in the database if email is not already in use, then sends verification code. Removes created
+    user if verification email fails to send so as not to lock that email out forever.
+
+    :param user: username/password information filled in on frontend
+    :type user: schemas.CreateUser
+    :param request: request sent by frontend
+    :type request: Request
+    :param db: database connection session to use
+    :type db: Session
+    :return: throws error or returns status success message
+    :rtype: {string: string}
+    """
+
     db_user = await services.get_user_by_email(user.email, db)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already in use")
 
-    return await services.create_user(user=user, request=request, db=db)
+    new_user = dbUser(
+        email=user.email, name=user.name, hashed_password=bcrypt.hash(user.password)
+    )
+    db.add(new_user)
+    db.commit()
+
+    db_user = db.query(dbUser).filter_by(email=user.email).filter(dbUser.verified_email == False).first()
+
+    try:
+        await services.generate_email(db_user=db_user, topic="verify_email", request=request)
+        db.commit()
+
+    except Exception:
+        db.refresh(db_user)
+        if db_user:
+            db.delete(db_user)
+            db.commit()
+        raise HTTPException(status_code=500, detail="Error sending verification email, account not created.")
+
+    return {"status": "success"}
 
 
 @app.post("/token")

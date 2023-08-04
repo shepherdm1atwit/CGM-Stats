@@ -14,7 +14,11 @@ Base = declarative_base()
 
 
 class User(Base):
-    """ User object for getting information to/from database """
+    """
+    User object for getting information to/from database
+
+    Note: egvs are stored and math is done in mg/dL units
+    """
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
@@ -31,24 +35,26 @@ class User(Base):
     pref_gluc_max = Column(String, default=None)
     pref_gluc_min = Column(String, default=None)
 
-    #   - BLOOD GLUCOSE VALUES STORED/MATH DONE IN mg/dL, (add ability to convert viewed values to mmol/L?)
-    #   - mg/dL in mmol/L, conversion factor: 1 mg/dL = 0.0555 mmol/L
+    #   -
 
     def verify_password(self, password: str):
         """ verifies user's password is correct
         :param password: hashed password
         :type password: str
-        :return:
-        :rtype:
+        :return: True if password (once hashed by bcrypt.verify()) matches that of given user stored in database,
+        False otherwise.
+        :rtype: bool
         """
 
         return bcrypt.verify(password, self.hashed_password)
 
 
 """ 
-Run on program start to create a local session connecting to the SQLite database if it exists, or create it, then 
-create session connection if it does not.
-Also creates test user if specified in app.config upon creating database.
+Below is run on program start to create a local session connecting to the SQLite database (via 
+sqlalchemy.orm.sessionmaker) if said database exists, or create database, then create session connection if it does not.
+
+Note: Also creates test user if specified in app.config upon creating database. Can be configured to not create test 
+user by leaving TEST_USER_EMAIL and TEST_USER_PASSWORD blank in app.config
 """
 if not database_exists(engine.url):
     Base.metadata.create_all(bind=engine)

@@ -121,40 +121,16 @@ async def change_password(token: str, password: str, db: Session):
     hashed_code.update(bytes.fromhex(token))
     verification_code = hashed_code.hexdigest()
 
-    user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
+    db_user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
 
-    if not user:
+    if not db_user:
         raise HTTPException(
             status_code=403, detail='Invalid password reset code')
     else:
-        user.verification_code = None
-        user.hashed_password = bcrypt.hash(password)
+        db_user.verification_code = None
+        db_user.hashed_password = bcrypt.hash(password)
         db.commit()
         return {"status": "success"}
-
-
-async def create_user(user: schemas.CreateUser, request: Request, db: Session):
-    # TODO: DOCUMENTATION HERE
-    user = dbUser(
-        email=user.email, name=user.name, hashed_password=bcrypt.hash(user.hashed_password)
-    )
-    db.add(user)
-    db.commit()
-
-    db_user = db.query(dbUser).filter_by(email=user.email).filter(dbUser.verified_email == False).first()
-
-    try:
-        await generate_email(db_user=db_user, topic="verify_email", request=request)
-        db.commit()
-
-    except Exception:
-        db.refresh(db_user)
-        if db_user:
-            db.delete(db_user)
-            db.commit()
-        raise HTTPException(status_code=500, detail="Error sending verification email, account not created.")
-
-    return {"status": "success"}
 
 
 async def verify_email(token: str, db: Session):
@@ -177,15 +153,22 @@ async def verify_email(token: str, db: Session):
 
 async def authenticate_user(email: str, password: str, db: Session):
     # TODO: DOCUMENTATION HERE
-    user = await get_user_by_email(db=db, email=email)
+    db_user = await get_user_by_email(db=db, email=email)
 
-    if user is not None and user.verify_password(password) and user.verified_email:
-        return user
+    if db_user is not None and db_user.verify_password(password) and db_user.verified_email:
+        return db_user
     return False
 
 
 async def create_jwt_token(user: dbUser):
-    # TODO: DOCUMENTATION HERE
+    """
+    Creates JWT token for a given user in the database
+
+    :param user: user to create token for
+    :type user: database.User
+    :return: dictionary (converted to json when sent to client) containing generated access token and token type
+    :rtype: dict
+    """
     user = schemas.User.from_orm(user)
     payload = user.dict()
     payload["exp"] = datetime.utcnow() + timedelta(minutes=JWT_EXP_MINUTES)
@@ -194,11 +177,17 @@ async def create_jwt_token(user: dbUser):
     return dict(access_token=token, token_type="bearer")
 
 
-async def get_current_user(
-        db: Session = Depends(get_db),
-        token: str = Depends(oauth2schema),
-):
-    # TODO: DOCUMENTATION HERE
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2schema)):
+    """
+    Gets current user given user's JWT authentication token
+
+    :param db: database connection session to use
+    :type db: Session
+    :param token: JWT token to decode/get user for
+    :type token: string
+    :return: User schema converted from database.User via schemas.User.from_orm()
+    :rtype: schemas.User
+    """
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
         user = db.query(dbUser).get(payload["id"])
@@ -215,7 +204,20 @@ async def get_current_user(
 
 
 async def check_dexcom_connection(request: Request, user: schemas.User, db: Session):
-    # TODO: DOCUMENTATION HERE
+    """
+    Checks if given user has a connected dexcom account. if access token is expired, will attempt to get new access
+    token through refresh_dexcom_tokens, then try again.
+
+    :param request: request from client
+    :type request: Request
+    :param user: current user (passed by api endpoint)
+    :type user: schemas.User
+    :param db: database connection session to use
+    :type db: Session
+    :return: throws error if error occurs in refresh_dexcom_tokens, else returns True if user has connected dexcom
+    account in database, False if not.
+    :rtype: bool
+    """
     try:
         db_user = db.query(dbUser).get(user.id)
         url = settings.DEXCOM_URL + "v3/users/self/devices"
@@ -233,12 +235,21 @@ async def check_dexcom_connection(request: Request, user: schemas.User, db: Sess
             return False
         return True
     except:
-        print("check_dexcom....")
         raise HTTPException(status_code=500, detail="Problem checking dexcom connection.")
 
 
 async def refresh_dexcom_tokens(request: Request, db_user: dbUser, db: Session):
-    # TODO: DOCUMENTATION HERE
+    """
+    Given a request, a user database object, and a database session, refreshes dexcom access token using stored refresh
+    token.
+
+    :param request: request from client for url scheme (http/https) information
+    :type request: Request
+    :param db_user: user object from database
+    :type db_user: database.User
+    :param db: database connection session to use
+    :type db: Session
+    """
     try:
         url = settings.DEXCOM_URL + "v2/oauth2/token"
         payload = {
@@ -260,10 +271,12 @@ async def refresh_dexcom_tokens(request: Request, db_user: dbUser, db: Session):
     db.commit()
 
 
-# Add user in database to avoid full account creation process during development/testing.
-# Email can be changed to a real email or mailtrap can be set as SMTP Provider to test.
 def create_test_user():
-    # TODO: DOCUMENTATION HERE
+    """
+    Add user in database to avoid full account creation process during development/testing. Email can be changed to a
+    real email or mailtrap can be set as SMTP Provider to test in app.config. If undesired, test email and password can
+    be left blank in config.
+    """
     email = settings.TEST_USER_EMAIL
     password = settings.TEST_USER_PASSWORD
     if email != "" and password != "":
