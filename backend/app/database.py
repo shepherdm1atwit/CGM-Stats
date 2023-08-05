@@ -1,3 +1,8 @@
+"""
+Stores User model that allows interfacing with the "users" table in the database, handles creating/making connections
+to the database
+"""
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, Column, String, Integer, Boolean
@@ -50,11 +55,8 @@ class User(Base):
 
 
 """ 
-Below is run on program start to create a local session connecting to the SQLite database (via 
-sqlalchemy.orm.sessionmaker) if said database exists, or create database, then create session connection if it does not.
-
-Note: Also creates test user if specified in app.config upon creating database. Can be configured to not create test 
-user by leaving TEST_USER_EMAIL and TEST_USER_PASSWORD blank in app.config
+Runs on program start to create a local session connecting to the SQLite database (via sqlalchemy.orm.sessionmaker) if 
+database exists. If not, creates database (including test user if configured), then create session connection.
 """
 if not database_exists(engine.url):
     Base.metadata.create_all(bind=engine)
@@ -62,6 +64,11 @@ if not database_exists(engine.url):
     email = settings.TEST_USER_EMAIL
     password = settings.TEST_USER_PASSWORD
     if email != "" and password != "":
+        """
+        Add user in database to avoid full account creation process during development/testing. Email can be changed to
+        a real email or mailtrap can be set as SMTP Provider to test in app.config. If undesired, test email and 
+        password can be left blank in config.
+        """
         dbSession = SessionLocal()
         user = User(email=email, name="TestUser", hashed_password=bcrypt.hash(password), verified_email=True)
         dbSession.add(user)

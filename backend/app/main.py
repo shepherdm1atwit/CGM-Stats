@@ -1,14 +1,22 @@
+"""
+Main body of code for CGM Stats backend/server-side operation. Contains all custom API endpoints including user
+management, dexcom connections, user preference management, and data manipulation before frontend visualization.
+"""
+
 from fastapi import Depends, FastAPI, HTTPException, Request, security
 from sqlalchemy.orm import Session
 from config import settings
 import services
 import schemas
 import requests
+from email_utils import Email
 from database import User as dbUser
-import datetime
 import calendar
 from statistics import pstdev
 from passlib.hash import bcrypt
+from datetime import timedelta, datetime
+import jwt
+from hashlib import sha256
 
 app = FastAPI()
 
@@ -17,12 +25,18 @@ app = FastAPI()
 
 @app.get("/api")
 async def root():
+    """
+    simple ping-pong endpoint to ensure client has connection to server.
+
+    :return: "CGM Stats"
+    :rtype: dict (json)
+    """
     return {"message": "CGM Stats"}
 
 
-#############################
-# CGM-Stats User Management #
-#############################
+###############################
+### User Management section ###
+###############################
 
 
 @app.post("/register")
@@ -54,7 +68,7 @@ async def register_user(user: schemas.CreateUser, request: Request, db: Session 
     db_user = db.query(dbUser).filter_by(email=user.email).filter(dbUser.verified_email == False).first()
 
     try:
-        await services.generate_email(db_user=db_user, topic="verify_email", request=request)
+        await Email(db_user=db_user, topic="verify_email", request=request).send()
         db.commit()
 
     except Exception:
@@ -70,9 +84,29 @@ async def register_user(user: schemas.CreateUser, request: Request, db: Session 
 @app.post("/token")
 async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends(), db: Session = Depends(
     services.get_db)):
-    user = await services.authenticate_user(form_data.username, form_data.password, db)
+    """
+    Generates and sends client jwt authentication token (assuming username/password from
+    security.OAuth2PasswordRequestForm is correct), else throws 401 unauthorized error
 
-    if not user:
+    :param form_data: email/password form data from client
+    :type form_data: security.OAuth2PasswordRequestForm
+    :param db: database connection session to use
+    :type db: Session
+    :return: dictionary (json) of access token and token_type="bearer"
+    :rtype: dict
+    """
+    db_user = await services.get_user_by_email(db=db, email=form_data.username)
+
+    if db_user is not None and db_user.verify_password(form_data.password) and db_user.verified_email:
+        user = schemas.User.from_orm(db_user)
+        payload = user.dict()
+        payload["exp"] = datetime.utcnow() + timedelta(minutes=settings.JWT_EXP_MINUTES)
+        token = jwt.encode(payload, settings.JWT_PRIVATE_KEY)
+
+        return dict(access_token=token, token_type="bearer")
+
+
+    else:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
 
     return await services.create_jwt_token(user)
@@ -80,22 +114,93 @@ async def generate_token(form_data: security.OAuth2PasswordRequestForm = Depends
 
 @app.get("/me")
 async def get_user(user: schemas.User = Depends(services.get_current_user)):
+    """
+    Returns user information upon request.
+
+    :param user: user whose information is being requested
+    :type user: schemas.User
+    :return: requested user information
+    :rtype: schemas.User
+    """
     return user
 
 
 @app.post('/verifyemail')
 async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
-    return await services.verify_email(token=token.token, db=db)
+    hashed_code = sha256()
+    hashed_code.update(bytes.fromhex(token.token))
+    verification_code = hashed_code.hexdigest()
+
+    db_user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
+
+    if not db_user:
+        raise HTTPException(
+            status_code=403, detail='Invalid verification code or account already verified')
+    else:
+        db_user.verification_code = None
+        db_user.verified_email = True
+        db.commit()
+        return {"status": "success"}
 
 
 @app.post('/resetrequest')
 async def reset_request(email: schemas.ForgotPassEmail, request: Request, db: Session = Depends(services.get_db)):
-    return await services.send_password_reset(email=email.email, request=request, db=db)
+    """
+    Checks that user exists and has verified email address, if so, sends password reset email trhough email_utils.Email.
+
+    :param email: email given in "reset password" prompt
+    :type email: string
+    :param request: api request for passing to email generation
+    :type request: Request
+    :param db: database connection to use
+    :type db: Session
+    :return: status message
+    :rtype: {string: string}
+    """
+    db_user = db.query(dbUser).filter_by(email=email.email).filter(dbUser.verified_email == True).first()
+    if db_user is None:
+        return {"status": "success"}
+
+    try:
+        await Email(db_user=db_user, topic="reset_password", request=request).send()
+        db.commit()
+        db.refresh(db_user)
+
+    except Exception:
+        raise HTTPException(
+            status_code=500, detail='Error sending verification email')
+
+    return {"status": "success"}
 
 
 @app.post('/resetpassword')
 async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.get_db)):
-    return await services.change_password(token=msg.token, password=msg.password, db=db)
+    """
+    Finds user with verification_code matching given "token" from password reset link and changes password to new
+    password in database, or throw error if it matches no user.
+
+    :param msg: message containing token to authenticate/identify user and new password to change to
+    :type msg: schemas.ResetPass
+    :param db: database connection to use
+    :type db: Session
+    :return: status message or throw error
+    :rtype: {string: string}
+    """
+
+    hashed_code = sha256()
+    hashed_code.update(bytes.fromhex(msg.token))
+    verification_code = hashed_code.hexdigest()
+
+    db_user = db.query(dbUser).filter(dbUser.verification_code == verification_code).first()
+
+    if not db_user:
+        raise HTTPException(
+            status_code=403, detail='Invalid password reset code')
+    else:
+        db_user.verification_code = None
+        db_user.hashed_password = bcrypt.hash(msg.password)
+        db.commit()
+        return {"status": "success"}
 
 
 @app.post('/savepreferences')
@@ -133,14 +238,45 @@ async def delete_preferences(user: schemas.User = Depends(services.get_current_u
     return {"Status": "Preferences successfully cleared."}
 
 
-##############################
-# Dexcom account managmement #
-##############################
+##################################
+### Dexcom account managmement ###
+##################################
 
 @app.get("/dexconnected")
-async def check_user_dex_connection(request: Request, user: schemas.User = Depends(services.get_current_user),
-                                    db: Session = Depends(services.get_db)):
-    return await services.check_dexcom_connection(request=request, user=user, db=db)
+async def check_dexcom_connection(request: Request, user: schemas.User = Depends(services.get_current_user),
+                                  db: Session = Depends(services.get_db)):
+    """
+    Checks if given user has a connected dexcom account. if access token is expired, will attempt to get new access
+    token through refresh_dexcom_tokens, then try again.
+
+    :param request: request from client
+    :type request: Request
+    :param user: current user (passed by api endpoint)
+    :type user: schemas.User
+    :param db: database connection session to use
+    :type db: Session
+    :return: throws error if error occurs in refresh_dexcom_tokens, else returns True if user has connected dexcom
+    account in database, False if not.
+    :rtype: bool
+    """
+    try:
+        db_user = db.query(dbUser).get(user.id)
+        url = settings.DEXCOM_URL + "v3/users/self/devices"
+        headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        if "fault" in data:
+            await services.refresh_dexcom_tokens(request=request, db_user=db_user, db=db)
+            db.refresh(db_user)
+            headers = {"Authorization": f"Bearer {db_user.dex_access_token}"}
+            response = requests.get(url, headers=headers)
+            data = response.json()
+            if "fault" not in data:
+                return True
+            return False
+        return True
+    except:
+        raise HTTPException(status_code=500, detail="Problem checking dexcom connection.")
 
 
 @app.post("/authdexcom")
@@ -194,9 +330,9 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
     return {"Status": "Dexcom account successfully disconnected."}
 
 
-#############################
-# Graphing ETC for frontend #
-#############################
+#########################################
+### Visualization information section ###
+#########################################
 
 
 @app.get('/getcurrentglucose')
@@ -204,8 +340,8 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
                               db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now()
-    start_time = end_time - datetime.timedelta(hours=8)
+    end_time = datetime.now()
+    start_time = end_time - timedelta(hours=8)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
@@ -230,7 +366,7 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
     if len(data["records"]) == 0:
         raise HTTPException(status_code=500, detail="no records found")
     record = data["records"][0]
-    date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    date_time = datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
     return {"value": record["value"], "trend": record["trend"], "timestamp": date_time.isoformat() + ".000Z"}
 
 
@@ -239,8 +375,8 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
                             db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now()
-    start_time = end_time - datetime.timedelta(hours=24)
+    end_time = datetime.now()
+    start_time = end_time - timedelta(hours=24)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
@@ -269,12 +405,12 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
 
     xy_pairs = []
 
-    date_time = datetime.datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    date_time = datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
     egv_sum = 0
     egv_count = 0
 
     for num_record, record in enumerate(records):
-        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        record_date_time = datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
         if record_date_time.hour == date_time.hour:
             egv_sum += record["value"]
             egv_count += 1
@@ -294,8 +430,8 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
                        db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now() - datetime.timedelta(days=1)
-    start_time = end_time - datetime.timedelta(days=30)
+    end_time = datetime.now() - timedelta(days=1)
+    start_time = end_time - timedelta(days=30)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
@@ -322,14 +458,14 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
     if len(records) == 0:
         raise HTTPException(status_code=500, detail="no records found")
 
-    date_time = datetime.datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+    date_time = datetime.strptime(records[0]["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
     date_vals = []
 
     lowest_std = None
     best_day = None
 
     for num_record, record in enumerate(records):
-        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        record_date_time = datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
         if record_date_time.date() == date_time.date():
             date_vals.append(record["value"])
         else:
@@ -347,7 +483,7 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
     egv_count = 0
 
     for num_record, record in enumerate(records):
-        record_date_time = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
+        record_date_time = datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ')
         if record_date_time.date() == best_day.date():
             if best_day_date_time is None:
                 best_day_date_time = record_date_time
@@ -377,8 +513,8 @@ async def get_past_day_pie(request: Request, user: schemas.User = Depends(servic
         return {"values": []}
 
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now()
-    start_time = end_time - datetime.timedelta(hours=24)
+    end_time = datetime.now()
+    start_time = end_time - timedelta(hours=24)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
@@ -426,8 +562,8 @@ async def get_box_plot(request: Request, user: schemas.User = Depends(services.g
                        db: Session = Depends(services.get_db)):
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
-    end_time = datetime.datetime.now()
-    start_time = end_time - datetime.timedelta(days=7)
+    end_time = datetime.now()
+    start_time = end_time - timedelta(days=7)
 
     url = f"{settings.DEXCOM_URL}v3/users/self/egvs"
 
@@ -461,7 +597,7 @@ async def get_box_plot(request: Request, user: schemas.User = Depends(services.g
     days.append(calendar.day_name[current_date.weekday()])
     current_day_num = 0
     for record in records:
-        record_date = datetime.datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ').date()
+        record_date = datetime.strptime(record["systemTime"], '%Y-%m-%dT%H:%M:%SZ').date()
 
         if record_date == current_date:
             val_by_day[current_day_num].append(record["value"])

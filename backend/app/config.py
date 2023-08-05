@@ -1,3 +1,7 @@
+"""
+Handles retrieving/making available configuration information from config file on program start
+"""
+
 from pydantic import BaseSettings, EmailStr
 
 

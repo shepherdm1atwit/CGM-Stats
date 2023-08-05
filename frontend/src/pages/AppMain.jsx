@@ -6,14 +6,14 @@
  * connection status, and component rendering based on the user's state.
  */
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
 import UserManage from "../bootstrap components/UserManage-BS";
 import NavBar from "../bootstrap components/NavBar-BS";
 import GraphCarousel from "../bootstrap components/GraphCarousel-BS";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import { Col, Modal, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import "../custom.scss";
 import PrimaryGraphs from "../bootstrap components/PrimaryGraphs-BS";
 import DexcomWarningModalBS from "../bootstrap components/DexcomWarningModal-BS";
@@ -25,12 +25,11 @@ import DexcomWarningModalBS from "../bootstrap components/DexcomWarningModal-BS"
  * Renders different sections of the application based on user's authentication and connection status.
  */
 const AppMain = () => {
-  const [message, setMessage] = useState("");
   const { authToken, dexConnect } = useContext(UserContext);
   const [token, setToken] = authToken;
   const [dexcomConnected] = dexConnect;
 
-    /**
+  /**
    * @function getWelcomeMessage
    * @description Fetch welcome message from the server
    */
@@ -42,13 +41,9 @@ const AppMain = () => {
       },
     };
     const response = await fetch("/api/api", requestOptions);
-    const data = await response.json();
-    //console.log(data)
 
     if (!response.ok) {
-      setMessage("Oops, something messed up, no backend connection.");
-    } else {
-      setMessage(data.message);
+      console.log("Error: no backend connection.");
     }
   };
 

@@ -1,8 +1,16 @@
+"""
+Contains email class and non-config environmental settings.
+Email class methods also handles all email-sending tasks.
+"""
+
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from jinja2 import Environment, select_autoescape, FileSystemLoader
-from pydantic import EmailStr, BaseModel
+from pydantic import EmailStr
 from config import settings
-from typing import List
+from database import User as dbUser
+from random import randbytes
+from hashlib import sha256
+from fastapi import Request
 
 """ Specify variables for using html templates. """
 env = Environment(
@@ -13,17 +21,29 @@ env = Environment(
 
 class Email:
     """
-    Email object, used to create emails customized for specific users using HTML templates.
+    Email object, creates custom emails to users using HTML templates.
+    Note: email not sent until
     """
 
-    def __init__(self, user: dict, url: str, email: List[EmailStr]):
-        self.name = user['name']
-        self.email = email
-        self.url = url
-        pass
+    def __init__(self, db_user: dbUser, topic: str, request: Request):
+        token = randbytes(10)
+        hashed_code = sha256()
+        hashed_code.update(token)
+        verification_code = hashed_code.hexdigest()
 
-    async def sendMail(self, subject, template):
-        # Define the config
+        db_user.verification_code = verification_code
+
+        self.name = db_user.name
+        self.email = [EmailStr(db_user.email)]
+        self.request = request
+        self.topic = topic
+        self.url = f"{self.request.url.scheme}://{settings.HOST_DOMAIN}/{topic.replace('_', '')}/{token.hex()}"
+
+    async def send(self):
+        """
+        Configures and sends email with information in object.
+        """
+
         conf = ConnectionConfig(
             MAIL_USERNAME=settings.EMAIL_USERNAME,
             MAIL_PASSWORD=settings.EMAIL_PASSWORD,
@@ -36,7 +56,13 @@ class Email:
             VALIDATE_CERTS=True
         )
         # Generate email based on template (specified in sending functions below)
-        template = env.get_template(f'{template}.html')
+        template = env.get_template(f'{self.topic}.html')
+        print(self.topic)
+
+        if self.topic == "verify_email":
+            subject = 'CGMStats: Verify your email'
+        elif self.topic == "reset_password":
+            subject = 'CGMStats: Your password reset link'
 
         html = template.render(
             url=self.url,
@@ -53,17 +79,5 @@ class Email:
         )
 
         # Send the email
-        fm = FastMail(conf)
-        await fm.send_message(message)
-
-    async def sendVerificationCode(self):
-        """
-        Sends account/email verification email by calling sendMail with the correct subject and template
-        """
-        await self.sendMail('CGMStats: Verify your email', 'verification')
-
-    async def sendResetCode(self):
-        """
-        Sends password reset verification email by calling sendMail with the correct subject and template
-        """
-        await self.sendMail('CGMStats: Your password reset link', 'password_reset')
+        mailer = FastMail(conf)
+        await mailer.send_message(message)

@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import ErrorMessage from "../components/ErrorMessage";
+import ErrorMessage from "../bootstrap components/ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
 import LogoutButtonBS from "./LogoutButton-BS";
-import { Log } from "victory";
 
 const SettingsModal = () => {
   const { authToken, userPrefs, dexConnect, sessionExp } =
