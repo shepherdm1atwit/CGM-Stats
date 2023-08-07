@@ -1,9 +1,22 @@
+/**
+ * @file PastDayGraph.jsx
+ * @brief Component to display the past day's blood glucose graph.
+ */
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import Plot from "react-plotly.js";
-import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 
+/**
+ * PastDayGraph Component
+ *
+ * This component fetches and visualizes the blood glucose data for the past day.
+ * The data includes x-y pairs where 'x' represents the time of reading and 'y'
+ * represents the blood glucose level. User-defined maximum and minimum levels are
+ * also shown on the graph.
+ *
+ * @returns {JSX.Element} The rendered PastDayGraph component.
+ */
 const PastDayGraph = () => {
   const { authToken, userPrefs, sessionExp } = useContext(UserContext);
   const [token, setToken] = authToken;
@@ -12,6 +25,10 @@ const PastDayGraph = () => {
   const [isActive] = useState(true);
   const [prefs] = userPrefs;
 
+  /**
+   * Uses an effect hook to make an API request to fetch past day's blood glucose data
+   * upon component mounting.
+   */
   useEffect(() => {
     const getPastDayGlucose = async () => {
       const requestOptions = {
@@ -35,6 +52,11 @@ const PastDayGraph = () => {
     getPastDayGlucose();
   }, []);
 
+  /**
+   * Formats the x-axis tick based on 12-hour format.
+   * @param {number} x - The x value (time) to be formatted.
+   * @returns {string} Formatted time string.
+   */
   const formatTick = (x) => {
     let hour = new Date(x).getHours();
     if (hour > 12) {
@@ -99,6 +121,7 @@ const PastDayGraph = () => {
 
   let config = { responsive: true };
 
+  // Render the past day's graph within a card
   return (
     <Card>
       <Card.Text className="justify-content-center">

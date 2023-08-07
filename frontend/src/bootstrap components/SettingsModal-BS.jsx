@@ -1,10 +1,24 @@
+/**
+ * @file SettingsModal.jsx
+ * @brief Modal component for user settings.
+ */
 import React, { useContext, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import ErrorMessage from "../bootstrap components/ErrorMessage-BS";
 import { UserContext } from "../context/UserContext";
 import LogoutButtonBS from "./LogoutButton-BS";
 
+/**
+ * SettingsModal Component
+ *
+ * Provides a modal window for users to update their glucose preferences
+ * or disconnect from their Dexcom account. Users can also clear
+ * their stored preferences or log out of their account.
+ *
+ * @returns {JSX.Element} Rendered modal for user settings.
+ */
 const SettingsModal = () => {
+  // Contextual states and methods from UserContext
   const { authToken, userPrefs, dexConnect, sessionExp } =
     useContext(UserContext);
   const [isActive, setIsActive] = useState(false);
@@ -19,6 +33,12 @@ const SettingsModal = () => {
   const handleClose = () => setIsActive(false);
   const handleShow = () => setIsActive(true);
 
+  /**
+   * Handles the form submission.
+   *
+   * This function sends updated glucose preferences to the backend.
+   * It provides feedback if there's an error in the input or communication.
+   */
   const handleSubmit = async () => {
     const maxGlucose = parseInt(maximumGlucose, 10);
     const minGlucose = parseInt(minimumGlucose, 10);

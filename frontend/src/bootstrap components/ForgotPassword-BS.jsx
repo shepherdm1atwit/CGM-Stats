@@ -1,3 +1,8 @@
+/**
+ * @file ForgotPassword.jsx
+ * @brief Component that allows users to request a password reset link.
+ */
+
 import React, { useState } from "react";
 import ErrorMessage from "./ErrorMessage-BS";
 import Form from "react-bootstrap/Form";
@@ -6,12 +11,30 @@ import Alert from "react-bootstrap/Alert";
 import Container from "react-bootstrap/Container";
 import { FloatingLabel } from "react-bootstrap";
 
+/**
+ * ForgotPassword Component
+ *
+ * Provides a form through which users can enter their email to request a password reset link.
+ * Displays messages based on the result of the password reset request.
+ *
+ * @returns {JSX.Element} Rendered forgot password form.
+ */
 const ForgotPassword = () => {
+  // State to track the entered email.
   const [email, setEmail] = useState("");
+  // State to track any error messages to display.
   const [errorMessage, setErrorMessage] = useState("");
+  // State to track success messages after request.
   const [successMessage, setSuccessMessage] = useState("");
 
+  /**
+   * submitReset Function
+   *
+   * Sends a request to the backend to initiate the password reset process.
+   * Sets the appropriate messages based on the response.
+   */
   const submitReset = async () => {
+    // Options for the fetch request.
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -29,6 +52,14 @@ const ForgotPassword = () => {
       setErrorMessage("");
     }
   };
+
+  /**
+   * handleSubmit Function
+   *
+   * Event handler for form submission. Calls the submitReset function.
+   *
+   * @param {Event} e - Form submission event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 

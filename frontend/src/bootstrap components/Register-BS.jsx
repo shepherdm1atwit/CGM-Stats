@@ -1,3 +1,7 @@
+/**
+ * @file Register.jsx
+ * @brief User registration component.
+ */
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -6,6 +10,15 @@ import Container from "react-bootstrap/Container";
 import ErrorMessage from "./ErrorMessage-BS";
 import { FloatingLabel } from "react-bootstrap";
 
+/**
+ * Register Component
+ *
+ * This component provides a form for users to register.
+ * Once registered, users will receive a verification link in their email.
+ * The component also provides feedback on registration status.
+ *
+ * @returns {JSX.Element} The rendered registration form.
+ */
 const Register = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -14,6 +27,9 @@ const Register = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
+    /**
+   * Asynchronously submit the registration data to the server.
+   */
   const submitRegistration = async () => {
     const requestOptions = {
       method: "POST",
@@ -37,6 +53,14 @@ const Register = () => {
     }
   };
 
+  /**
+   * Handle the form submission event.
+   *
+   * This method ensures that the password meets length requirements
+   * and that the password matches the confirmation password.
+   *
+   * @param {Event} e - The form submission event.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password === confirmationPassword && password.length > 5) {

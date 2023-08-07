@@ -1,3 +1,7 @@
+/**
+ * @file UserManage.jsx
+ * @brief Component to manage user interactions like Registering, Logging in, and Resetting Password.
+ */
 import React, { useState } from "react";
 import Register from "./Register-BS";
 import Login from "./Login-BS";
@@ -6,6 +10,15 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 
+/**
+ * UserManage Component
+ *
+ * Provides a card-based interface for users to switch between Registering,
+ * Logging in, and Resetting their Password. The content of the card changes
+ * based on which action the user wants to perform.
+ *
+ * @returns {JSX.Element} Rendered component for user management actions.
+ */
 const UserManage = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(true);

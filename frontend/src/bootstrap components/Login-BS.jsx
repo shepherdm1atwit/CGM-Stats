@@ -1,18 +1,43 @@
-import React, { useState, useContext, useEffect } from "react";
-import ErrorMessage from "./ErrorMessage-BS";
-import { UserContext } from "../context/UserContext";
-import { Form, Button, Container, FloatingLabel } from "react-bootstrap";
+/**
+ * @file Login.jsx
+ * @brief Component to manage user login.
+ */
 
+import React, { useState, useContext, useEffect } from "react";
+import ErrorMessage from "./ErrorMessage-BS";   ///< Component for displaying error messages
+import { UserContext } from "../context/UserContext";   ///< User context for global state management
+import { Form, Button, Container, FloatingLabel } from "react-bootstrap";   ///< Bootstrap React components
+
+/**
+ * Login Component
+ *
+ * This component manages user login by capturing email and password and sending it to an API endpoint.
+ * It also displays error messages as appropriate and handles session expiration.
+ *
+ * @returns {JSX.Element} The rendered Login component.
+ */
 const Login = () => {
+  // State for managing user inputs and error message
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Extract authentication token and session expiration context
   const { authToken, sessionExp } = useContext(UserContext);
   const [sessionExpired, setSessionExpired] = sessionExp;
   const [, setToken] = authToken;
 
+  /**
+   * Handles submission of the login form.
+   *
+   * Sends a POST request to the API with the provided email and password.
+   * If the response contains an error, sets the error message; otherwise, stores the access token.
+   *
+   * @param {Event} e - The form submission event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -30,6 +55,12 @@ const Login = () => {
     }
   };
 
+  /**
+   * Effect hook for managing session expiration.
+   *
+   * If the session has expired, logs the expiration and resets the session expiration flag,
+   * then displays an error message prompting the user to log in again.
+   */
   useEffect(() => {
     if (sessionExpired === true) {
       console.log("expired " + sessionExpired);
@@ -39,11 +70,10 @@ const Login = () => {
     }
   }, []);
 
+  // Rendering the login form
   return (
     <Container className="w-75 justify-content-center">
       <Form onSubmit={handleSubmit}>
-        {/* <h3 className="mb-3" align="center">Welcome Back</h3>*/}
-
         <Form.Group className="mb-3">
           <FloatingLabel label="Email Address">
             <Form.Control

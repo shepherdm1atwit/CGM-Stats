@@ -1,10 +1,22 @@
+/**
+ * @file BestDayGraph.jsx
+ * @brief Renders a graph visualization of the user's best day in terms of blood glucose levels.
+ */
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import Plot from "react-plotly.js";
-import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
 import "../custom.scss";
 
+/**
+ * BestDayGraph Component
+ *
+ * This component fetches and displays a scatter graph showcasing the user's best day in terms
+ * of blood glucose levels. It also shows the date of the best day and the standard deviation
+ * for that day. If the user's session is expired, it updates the session state.
+ *
+ * @returns {JSX.Element} Rendered graph visualization component.
+ */
 const BestDayGraph = () => {
   const { authToken, userPrefs, sessionExp } = useContext(UserContext);
   const [token, setToken] = authToken;
@@ -15,6 +27,9 @@ const BestDayGraph = () => {
   const [, setErrorMessage] = useState("");
   const [prefs] = userPrefs;
 
+  /**
+     * Asynchronous function to fetch data about the user's best day in terms of blood glucose levels.
+     */
   useEffect(() => {
     const getBestDay = async () => {
       const requestOptions = {

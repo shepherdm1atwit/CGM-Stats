@@ -1,3 +1,7 @@
+/**
+ * @file CurrentGlucoseLevel.jsx
+ * @brief Displays the current glucose level using a circular progress bar and trend arrow.
+ */
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
@@ -11,12 +15,23 @@ import {
   ArrowUpRight,
 } from "react-feather";
 
+/**
+ * CurrentGlucoseLevel Component
+ *
+ * This component fetches and displays the current glucose value using a circular progress bar.
+ * It also displays the trend of glucose change using an arrow icon.
+ *
+ * @returns {JSX.Element} Rendered component
+ */
 const CurrentGlucoseLevel = () => {
   const { authToken } = useContext(UserContext);
   const [token, setToken] = authToken;
   const [currentGlucose, setCurrentGlucose] = useState("");
   const [currentTrend, setCurrentTrend] = useState("");
 
+  /**
+   * On component mount, fetch the current glucose level and set state.
+   */
   useEffect(() => {
     const getCurrentGlucose = async () => {
       const requestOptions = {
@@ -43,6 +58,9 @@ const CurrentGlucoseLevel = () => {
     getCurrentGlucose();
   }, []);
 
+  /**
+   * Determine the appropriate arrow icon based on the current glucose trend.
+   */
   let arrowIcon = null;
 
   switch (currentTrend) {
@@ -71,6 +89,12 @@ const CurrentGlucoseLevel = () => {
       arrowIcon = <ArrowRight size="32" strokeWidth="1" />;
   }
 
+  /**
+   * Determine the color of the progress bar based on the glucose level.
+   *
+   * @param {number} glucoseLevel - The current glucose level
+   * @returns {string} A color code based on the glucose level range
+   */
   const getProgressBarColor = (glucoseLevel) => {
     if(glucoseLevel <= 70) return '#ff5722';
     if(glucoseLevel >= 180) return '#fbc02d';
