@@ -127,6 +127,17 @@ async def get_user(user: schemas.User = Depends(services.get_current_user)):
 
 @app.post('/verifyemail')
 async def verify_me(token: schemas.VerifyEmail, db: Session = Depends(services.get_db)):
+    """
+    Called when user clicks on "verify email" link sent to email upon creating account. Uses code attached to link to
+    verify user's email in database.
+
+    :param token: schema containing verification token from email verification link
+    :type token: schemas.VerifyEmail
+    :param db: database session to connect to
+    :type db: Session
+    :return: success message or error code if failed
+    :rtype: {string: string}
+    """
     hashed_code = sha256()
     hashed_code.update(bytes.fromhex(token.token))
     verification_code = hashed_code.hexdigest()
@@ -207,6 +218,19 @@ async def reset_password(msg: schemas.ResetPass, db: Session = Depends(services.
 async def save_preferences(preferences: schemas.UserPreferences,
                            user: schemas.User = Depends(services.get_current_user),
                            db: Session = Depends(services.get_db)):
+    """
+    Called when user updates/saves their preferences. Updates said preferences in database for said user
+
+    :param preferences: schema containing user preferences from client (currently min/max glucose vals)
+    :type preferences: schemas.UserPreferences
+    :param user: user to update preferences for (from services.get_current_user)
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: status message or throw error
+    :rtype: {string: string}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     try:
         db_user.pref_gluc_min = preferences.minimum
@@ -217,10 +241,20 @@ async def save_preferences(preferences: schemas.UserPreferences,
     return {"Status": "Success"}
 
 
-# Potentially use this in UserContext?
 @app.get('/getpreferences')
 async def get_preferences(user: schemas.User = Depends(services.get_current_user),
                           db: Session = Depends(services.get_db)):
+    """
+    Get current user's preferences for sending to client.
+
+    :param user: Current user (from get_current_user) to get preferences for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: user's preferences in UserPreferences schema
+    :rtype: schemas.UserPreferences
+    """
+
     db_user = db.query(dbUser).get(user.id)
     return schemas.UserPreferences(minimum=db_user.pref_gluc_min, maximum=db_user.pref_gluc_max)
 
@@ -228,6 +262,17 @@ async def get_preferences(user: schemas.User = Depends(services.get_current_user
 @app.delete('/deletepreferences')
 async def delete_preferences(user: schemas.User = Depends(services.get_current_user),
                              db: Session = Depends(services.get_db)):
+    """
+    Clears user preferences from database, setting min and max to None.
+
+    :param user: Current user (from get_current_user) to delete preferences for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: status message or throw error
+    :rtype: {string: string}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     try:
         db_user.pref_gluc_max = None
@@ -235,7 +280,7 @@ async def delete_preferences(user: schemas.User = Depends(services.get_current_u
         db.commit()
     except:
         raise HTTPException(status_code=500, detail="Error removing preferences from database")
-    return {"Status": "Preferences successfully cleared."}
+    return {"Status": "Success"}
 
 
 ##################################
@@ -259,6 +304,7 @@ async def check_dexcom_connection(request: Request, user: schemas.User = Depends
     account in database, False if not.
     :rtype: bool
     """
+
     try:
         db_user = db.query(dbUser).get(user.id)
         url = settings.DEXCOM_URL + "v3/users/self/devices"
@@ -283,6 +329,22 @@ async def check_dexcom_connection(request: Request, user: schemas.User = Depends
 async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode,
                               user: schemas.User = Depends(services.get_current_user),
                               db: Session = Depends(services.get_db)):
+    """
+    Once Oauth2 steps completed on client, this endpoint is called. Uses dexcom auth code sent from client to get access
+    & refresh tokens, then store in database for that user.
+
+    :param request: Request from client, used for building redirect URI (URI that dexcom sends data back to after auth)
+    :type request: Request
+    :param authcode: schema containing dexcom auth code
+    :type authcode: schemas.DexcomAuthCode
+    :param user: current user (from get_current_user)
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: status message or throw error
+    :rtype: {string: string}
+    """
+
     try:
         url = settings.DEXCOM_URL + "v2/oauth2/token"
 
@@ -320,6 +382,17 @@ async def authenticate_dexcom(request: Request, authcode: schemas.DexcomAuthCode
 @app.delete('/disconnectdexcom')
 async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_user),
                             db: Session = Depends(services.get_db)):
+    """
+    "Disconnects" user's dexcom account by setting access & refresh tokens to None in database
+
+    :param user: current user (from get_current_user) to disconnect account from
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: status message or throw error
+    :rtype: {string: string}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     try:
         db_user.dex_access_token = None
@@ -338,6 +411,19 @@ async def disconnect_dexcom(user: schemas.User = Depends(services.get_current_us
 @app.get('/getcurrentglucose')
 async def get_current_glucose(request: Request, user: schemas.User = Depends(services.get_current_user),
                               db: Session = Depends(services.get_db)):
+    """
+    Gets "current" EGV (3 hours behind, but that's the most recent dexcom's API will give us)
+
+    :param request: Request from client, used for refreshing dexcom tokens if expired
+    :type request: Request
+    :param user: current user (from get_current_user) to get most recent egv for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: dictionary (json) containing egv record's value, trend (up/down/etc), and timestamp (in iso format)
+    :rtype: {string: int, string: string, string: string}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.now()
@@ -373,6 +459,19 @@ async def get_current_glucose(request: Request, user: schemas.User = Depends(ser
 @app.get('/getpastdayegvs')
 async def get_past_day_egvs(request: Request, user: schemas.User = Depends(services.get_current_user),
                             db: Session = Depends(services.get_db)):
+    """
+    Gets all egvs for the past 24 hours for given user, gets x, y pairs for graphing, sends to frontend
+
+    :param request: Request from client, used for refreshing dexcom tokens if expired
+    :type request: Request
+    :param user: current user (from get_current_user) to get egvs for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: list of x,y pairs for graphing on frontend
+    :rtype: {string: list}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.now()
@@ -428,6 +527,19 @@ async def get_past_day_egvs(request: Request, user: schemas.User = Depends(servi
 @app.get('/getbestday')
 async def get_best_day(request: Request, user: schemas.User = Depends(services.get_current_user),
                        db: Session = Depends(services.get_db)):
+    """
+    Calculates a user's "best day" in the past month (based on lowest standard deviation)
+
+    :param request: Request from client, used for refreshing dexcom tokens if expired
+    :type request: Request
+    :param user: current user (from get_current_user) to get best day of
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: dict (json) cointaining best day's date, standard deviation, and x, y pairs for graphing
+    :rtype: {string: string, string: float, string: list}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.now() - timedelta(days=1)
@@ -505,6 +617,19 @@ async def get_best_day(request: Request, user: schemas.User = Depends(services.g
 @app.get('/getpastdaypie')
 async def get_past_day_pie(request: Request, user: schemas.User = Depends(services.get_current_user),
                            db: Session = Depends(services.get_db)):
+    """
+    Calculates percentages for how much of past 24 hours was spent in, above, or below desired range.
+
+    :param request: Request from client, used for refreshing dexcom tokens if expired
+    :type request: Request
+    :param user: current user (from get_current_user) to get percentages for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: list of percentages for pie graph in format [% in range, % above range, % below range]
+    :rtype: {string: list}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     pref_min = db_user.pref_gluc_min
     pref_max = db_user.pref_gluc_max
@@ -560,6 +685,19 @@ async def get_past_day_pie(request: Request, user: schemas.User = Depends(servic
 @app.get('/getpastweekboxplot')
 async def get_box_plot(request: Request, user: schemas.User = Depends(services.get_current_user),
                        db: Session = Depends(services.get_db)):
+    """
+    Generates boxplot of egvs for past 7 days
+
+    :param request: Request from client, used for refreshing dexcom tokens if expired
+    :type request: Request
+    :param user: current user (from get_current_user) to get values for
+    :type user: schemas.User
+    :param db: database connection to use
+    :type db: Session
+    :return: dict containing values per each day and each day's names (saturday, sunday, etc)
+    :rtype: {string: list, string: list}
+    """
+
     db_user = db.query(dbUser).get(user.id)
     access_token = db_user.dex_access_token
     end_time = datetime.now()

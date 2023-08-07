@@ -10,7 +10,7 @@ from config import settings
 from database import User as dbUser
 from random import randbytes
 from hashlib import sha256
-from fastapi import Request
+from fastapi import Request, HTTPException
 
 """ Specify variables for using html templates. """
 env = Environment(
@@ -63,7 +63,10 @@ class Email:
             subject = 'CGMStats: Verify your email'
         elif self.topic == "reset_password":
             subject = 'CGMStats: Your password reset link'
+        else:
+            raise HTTPException(status_code=500, detail="Invalid topic for email.")
 
+        # Render email using given template with specified url, name, and subject
         html = template.render(
             url=self.url,
             first_name=self.name,
